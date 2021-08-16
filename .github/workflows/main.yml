@@ -1,0 +1,36 @@
+name: CI/CD
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master, dev]
+
+jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [16.6.2]
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+          fetch-depth: 0
+
+      - name: Set up Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Git Fetch
+        run: git fetch --no-tags --prune --depth=5 origin master
+
+      - name: Install Dependencies
+        run: yarn -s --frozen-lockfile
+
+      - name: Run Linter
+        run: yarn lint
