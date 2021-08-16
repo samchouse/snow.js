@@ -1,5 +1,5 @@
 {
-  "name": "snow.js",
+  "name": "@xenfo/snow.js",
   "version": "0.0.1",
   "description": "A framework for Discord.JS",
   "main": "./dist/index.js",
