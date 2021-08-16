@@ -9,6 +9,8 @@
   "license": "MIT",
   "scripts": {
     "postinstall": "is-ci || husky install",
+    "build": "tsc",
+    "watch": "tsc --watch",
     "lint": "run-s lint:eslint lint:prettier",
     "lint:eslint": "eslint --ignore-path .gitignore --ext .js,.ts,.tsx --fix .",
     "lint:prettier": "prettier --write --ignore-path .gitignore *.json"
