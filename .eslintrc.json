@@ -1,3 +1,7 @@
 {
-  "extends": ["marine/prettier/node"]
+  "parser": "@typescript-eslint/parser",
+  "extends": ["marine/prettier/node"],
+  "rules": {
+    "@typescript-eslint/no-unused-vars": ["error", { "argsIgnorePattern": "^_", "varsIgnorePattern": "^_" }]
+  }
 }
