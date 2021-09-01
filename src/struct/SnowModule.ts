@@ -3,7 +3,7 @@ import SnowClient from './SnowClient';
 import SnowHandler from './SnowHandler';
 
 class SnowModule {
-  public category: Category<string, SnowModule> | null;
+  public category: Category | null;
   public categoryID: string;
   public client: SnowClient | null;
   public filepath: string | null;

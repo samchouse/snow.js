@@ -23,9 +23,14 @@ class SnowError extends Error {
   public code: string;
 
   public constructor(key: string, ...args: Array<string | boolean>) {
-    if (Messages[key as keyof typeof Messages] === null)
+    if (
+      !(Messages[key as keyof typeof Messages] as
+        | typeof Messages[keyof typeof Messages]
+        | undefined)
+    )
       throw new TypeError(`Error key '${key}' does not exist`);
 
+    // @ts-ignore
     super(Messages[key as keyof typeof Messages](...args));
 
     this.code = key;

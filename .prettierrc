@@ -1,9 +1,0 @@
-{
-  "parser": "babel-ts",
-  "semi": true,
-  "singleQuote": true,
-  "bracketSpacing": true,
-  "trailingComma": "none",
-  "importOrder": ["^[./]"],
-  "importOrderSeparation": true
-}

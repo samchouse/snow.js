@@ -1,19 +1,9 @@
-import { Message, PermissionResolvable, Snowflake } from 'discord.js';
+import { PermissionResolvable, Snowflake } from 'discord.js';
 import EventEmitter from 'events';
-import Command from '../struct/commands/Command';
 
 import SnowModule from '../struct/SnowModule';
 
 export type LoadPredicate = (filepath: string) => boolean;
-
-export type MissingPermissionSupplier = (
-  message: Message
-) => Promise<any> | any;
-
-export type IgnoreCheckPredicate = (
-  message: Message,
-  command: Command
-) => boolean;
 
 export type ArgumentOptions =
   | BooleanArgumentOptions
@@ -87,6 +77,7 @@ export interface ListenerOptions extends SnowModuleOptions {
 
 export interface BaseArgumentOptions {
   id: string;
+  name: string;
   type: string;
   description: string;
   required: boolean;
@@ -105,11 +96,11 @@ export interface CommandHandlerOptions extends SnowHandlerOptions {
   blockClient?: boolean;
   defaultCooldown?: number;
   fetchMembers?: boolean;
-  ignoreCooldown?: Snowflake | Snowflake[] | IgnoreCheckPredicate;
-  ignorePermissions?: Snowflake | Snowflake[] | IgnoreCheckPredicate;
+  ignoreCooldown?: Snowflake | Snowflake[];
 }
 
 export interface CommandOptions extends SnowModuleOptions {
+  name?: string;
   parent?: string;
   description?: string;
   args?: ArgumentOptions[];
@@ -118,13 +109,7 @@ export interface CommandOptions extends SnowModuleOptions {
   ratelimit?: number;
   typing?: boolean;
   ownerOnly?: boolean;
-  clientPermissions?:
-    | PermissionResolvable
-    | PermissionResolvable[]
-    | MissingPermissionSupplier;
-  ignoreCooldown?: Snowflake | Snowflake[] | IgnoreCheckPredicate;
-  userPermissions?:
-    | PermissionResolvable
-    | PermissionResolvable[]
-    | MissingPermissionSupplier;
+  ignoreCooldown?: Snowflake | Snowflake[];
+  clientPermissions?: PermissionResolvable | PermissionResolvable[];
+  userPermissions?: PermissionResolvable | PermissionResolvable[];
 }

@@ -1,7 +1,6 @@
 import SnowError from '../../utils/SnowError';
 import SnowHandler from '../SnowHandler';
 import Inhibitor from './Inhibitor';
-import { isPromise } from '../../utils/Utils';
 import Command from '../commands/Command';
 import { Collection, CommandInteraction, Message } from 'discord.js';
 import SnowClient from '../SnowClient';
@@ -57,8 +56,7 @@ class InhibitorHandler extends SnowHandler {
     for (const inhibitor of inhibitors.values()) {
       promises.push(
         (async () => {
-          let inhibited = inhibitor.exec(messageOrInteraction, command);
-          if (isPromise(inhibited)) inhibited = await inhibited;
+          const inhibited = await inhibitor.exec(messageOrInteraction, command);
           if (inhibited) return inhibitor;
           return null;
         })()
@@ -68,8 +66,8 @@ class InhibitorHandler extends SnowHandler {
     const inhibitedInhibitors = (await Promise.all(promises)).filter((r) => r);
     if (!inhibitedInhibitors.length) return null;
 
-    inhibitedInhibitors.sort((a, b) => b.priority - a.priority);
-    return inhibitedInhibitors[0].reason;
+    inhibitedInhibitors.sort((a, b) => (b?.priority ?? 0) - (a?.priority ?? 0));
+    return inhibitedInhibitors[0]?.reason;
   }
 }
 

@@ -1,10 +1,8 @@
 import { Collection, CommandInteraction, Message } from 'discord.js';
-import { CommandHandlerOptions, IgnoreCheckPredicate } from '../../typings';
+import { CommandHandlerOptions } from '../../typings';
 import { BuiltInReasons, CommandHandlerEvents } from '../../utils/Constants';
 import SnowError from '../../utils/SnowError';
-import { isPromise } from '../../utils/Utils';
 import InhibitorHandler from '../inhibitors/InhibitorHandler';
-import ListenerHandler from '../listeners/ListenerHandler';
 import SnowClient from '../SnowClient';
 import SnowHandler from '../SnowHandler';
 import Command from './Command';
@@ -14,11 +12,10 @@ class CommandHandler extends SnowHandler {
   public blockBots: boolean;
   public blockClient: boolean;
   public fetchMembers: boolean;
-  public commands: Set<string>;
   public defaultCooldown: number;
+  public ignoreCooldown: string | string[];
+  public commands: Collection<string, string>;
   public inhibitorHandler: InhibitorHandler | null;
-  public ignoreCooldown: string | string[] | IgnoreCheckPredicate;
-  public ignorePermissions: string | string[] | IgnoreCheckPredicate;
   public cooldowns: Collection<
     string,
     {
@@ -42,8 +39,7 @@ class CommandHandler extends SnowHandler {
       blockBots = true,
       fetchMembers = false,
       defaultCooldown = 0,
-      ignoreCooldown = client.ownerID,
-      ignorePermissions = []
+      ignoreCooldown = client.ownerID
     }: CommandHandlerOptions = {}
   ) {
     if (
@@ -71,11 +67,9 @@ class CommandHandler extends SnowHandler {
     this.blockBots = blockBots;
     this.defaultCooldown = defaultCooldown;
     this.ignoreCooldown = ignoreCooldown;
-    this.ignorePermissions = ignorePermissions;
 
-    this.commands = new Set();
+    this.commands = new Collection();
     this.cooldowns = new Collection();
-    this.resolver = new TypeResolver(this);
 
     this.setup();
   }
@@ -92,21 +86,27 @@ class CommandHandler extends SnowHandler {
     });
   }
 
-  public override register(command: Command, filepath?: string) {
+  public override register(command: Command, filepath: string) {
     super.register(command, filepath);
 
-    const id = command.id.toLowerCase();
+    if (!command.name) throw new Error(`No name for ${command.id}`);
 
-    const conflict = this.commands.has(id);
-    if (conflict) throw new SnowError('ALIAS_CONFLICT', command.id);
+    const conflict = {
+      id: this.commands.has(command.id.toLowerCase()),
+      name:
+        typeof this.commands.find(
+          (name) => name === command.name!.toLowerCase()
+        ) === 'string'
+    };
 
-    this.commands.add(id);
+    if (conflict.id || conflict.name)
+      throw new SnowError('ALIAS_CONFLICT', command.id, command.name);
+
+    this.commands.set(command.id.toLowerCase(), command.name.toLowerCase());
   }
 
   public override deregister(command: Command) {
-    const id = command.id.toLowerCase();
-
-    this.commands.delete(id);
+    this.commands.delete(command.id.toLowerCase());
 
     super.deregister(command);
   }
@@ -278,26 +278,12 @@ class CommandHandler extends SnowHandler {
     return false;
   }
 
-  public async runPermissionChecks(
+  public runPermissionChecks(
     interaction: CommandInteraction,
     command: Command
   ) {
     if (command.clientPermissions) {
-      if (typeof command.clientPermissions === 'function') {
-        let missing = command.clientPermissions(interaction);
-        if (isPromise(missing)) missing = await missing;
-
-        if (missing !== null) {
-          this.emit(
-            CommandHandlerEvents.MISSING_PERMISSIONS,
-            interaction,
-            command,
-            'client',
-            missing
-          );
-          return true;
-        }
-      } else if (interaction.guild && interaction.channel?.type !== 'DM') {
+      if (interaction.guild && interaction.channel?.type !== 'DM') {
         const missing = interaction.channel
           ?.permissionsFor(this.client.user!)
           ?.missing(command.clientPermissions);
@@ -315,42 +301,19 @@ class CommandHandler extends SnowHandler {
     }
 
     if (command.userPermissions) {
-      const ignorer = command.ignorePermissions || this.ignorePermissions;
-      const isIgnored = Array.isArray(ignorer)
-        ? ignorer.includes(interaction.user.id)
-        : typeof ignorer === 'function'
-        ? ignorer(interaction, command)
-        : interaction.user.id === ignorer;
-
-      if (!isIgnored) {
-        if (typeof command.userPermissions === 'function') {
-          let missing = command.userPermissions(interaction);
-          if (isPromise(missing)) missing = await missing;
-
-          if (missing !== null) {
-            this.emit(
-              CommandHandlerEvents.MISSING_PERMISSIONS,
-              interaction,
-              command,
-              'user',
-              missing
-            );
-            return true;
-          }
-        } else if (interaction.guild && interaction.channel?.type !== 'DM') {
-          const missing = interaction.channel
-            ?.permissionsFor(interaction.user)
-            ?.missing(command.userPermissions);
-          if (missing?.length) {
-            this.emit(
-              CommandHandlerEvents.MISSING_PERMISSIONS,
-              interaction,
-              command,
-              'user',
-              missing
-            );
-            return true;
-          }
+      if (interaction.guild && interaction.channel?.type !== 'DM') {
+        const missing = interaction.channel
+          ?.permissionsFor(interaction.user)
+          ?.missing(command.userPermissions);
+        if (missing?.length) {
+          this.emit(
+            CommandHandlerEvents.MISSING_PERMISSIONS,
+            interaction,
+            command,
+            'user',
+            missing
+          );
+          return true;
         }
       }
     }
@@ -359,11 +322,9 @@ class CommandHandler extends SnowHandler {
   }
 
   public runCooldowns(interaction: CommandInteraction, command: Command) {
-    const ignorer = command.ignoreCooldown || this.ignoreCooldown;
+    const ignorer = command.ignoreCooldown ?? this.ignoreCooldown;
     const isIgnored = Array.isArray(ignorer)
       ? ignorer.includes(interaction.user.id)
-      : typeof ignorer === 'function'
-      ? ignorer(interaction, command)
       : interaction.user.id === ignorer;
 
     if (isIgnored) return false;
@@ -408,30 +369,28 @@ class CommandHandler extends SnowHandler {
   }
 
   public async runCommand(interaction: CommandInteraction, command: Command) {
-    if (command.typing) {
-      interaction.channel?.sendTyping();
-    }
+    if (command.typing) interaction.channel?.sendTyping();
 
     const args = command.args?.map((arg) => {
       switch (arg.type) {
         case 'boolean':
-          return interaction.options.getBoolean(arg.id);
+          return interaction.options.getBoolean(arg.name);
         case 'integer':
-          return interaction.options.getInteger(arg.id);
+          return interaction.options.getInteger(arg.name);
         case 'number':
-          return interaction.options.getNumber(arg.id);
+          return interaction.options.getNumber(arg.name);
         case 'string':
-          return interaction.options.getString(arg.id);
+          return interaction.options.getString(arg.name);
         case 'user':
-          return interaction.options.getUser(arg.id);
+          return interaction.options.getUser(arg.name);
         case 'mentionable':
-          return interaction.options.getMentionable(arg.id);
+          return interaction.options.getMentionable(arg.name);
         case 'channel':
-          return interaction.options.getChannel(arg.id);
+          return interaction.options.getChannel(arg.name);
         case 'role':
-          return interaction.options.getRole(arg.id);
+          return interaction.options.getRole(arg.name);
         case 'member':
-          return interaction.options.getMember(arg.id);
+          return interaction.options.getMember(arg.name);
       }
     });
 
@@ -474,21 +433,8 @@ class CommandHandler extends SnowHandler {
     throw err;
   }
 
-  public findCommand(name: string) {
-    return (this.modules as Collection<string, Command>).get(
-      name.toLowerCase()
-    );
-  }
-
   public useInhibitorHandler(inhibitorHandler: InhibitorHandler) {
     this.inhibitorHandler = inhibitorHandler;
-    this.resolver.inhibitorHandler = inhibitorHandler;
-
-    return this;
-  }
-
-  public useListenerHandler(listenerHandler: ListenerHandler) {
-    this.resolver.listenerHandler = listenerHandler;
 
     return this;
   }
