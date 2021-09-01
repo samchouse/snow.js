@@ -15,7 +15,7 @@
 
 ## What is Snow.JS
 
-Snow.JS is a framework for Discord.JS, largely inspired by Discord Akairo which unfortunately will not be receiving feature updates anymore.
+Snow.JS is a framework for Discord.JS, largely inspired by Discord-Akairo which unfortunately will not be receiving feature updates anymore.
 
 ## Contribution
 
