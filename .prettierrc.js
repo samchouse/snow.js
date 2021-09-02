@@ -1,5 +1,4 @@
 module.exports = {
-  parser: 'babel-ts',
   semi: true,
   singleQuote: true,
   bracketSpacing: true,
@@ -7,5 +6,13 @@ module.exports = {
   importOrder: ['^[./]'],
   importOrderSeparation: true,
   experimentalBabelParserPluginsList: ['typescript'],
-  plugins: [require.resolve('@trivago/prettier-plugin-sort-imports')]
+  plugins: [require.resolve('@trivago/prettier-plugin-sort-imports')],
+  overrides: [
+    {
+      files: ['*.ts'],
+      options: {
+        parser: 'babel-ts',
+      },
+    }
+  ]
 };
