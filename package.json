@@ -8,8 +8,8 @@
   "author": "Samuel Corsi-House <chouse.samuel@gmail.com>",
   "license": "MIT",
   "scripts": {
-    "pub": "yarn build && yarn publish dist",
-    "build": "cd .. && tsc && cp README.md dist && cp LICENSE dist",
+    "pub": "tsc && cp README.md dist && cp LICENSE dist && yarn publish dist",
+    "build": "tsc",
     "watch": "tsc --watch",
     "lint": "run-s lint:eslint lint:prettier",
     "lint:eslint": "eslint --ignore-path .gitignore --ext .js,.ts,.tsx --fix .",
