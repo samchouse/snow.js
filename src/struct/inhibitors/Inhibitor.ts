@@ -28,7 +28,7 @@ class Inhibitor extends SnowModule {
   public exec(
     _messageOrInteraction: Message | CommandInteraction,
     _command?: Command
-  ) {
+  ): boolean | Promise<boolean> {
     throw new SnowError('NOT_IMPLEMENTED', this.constructor.name, 'exec');
   }
 }

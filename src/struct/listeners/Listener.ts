@@ -19,7 +19,7 @@ class Listener extends SnowModule {
     this.type = type;
   }
 
-  public exec() {
+  public exec(..._arr: any[]): any | Promise<any> {
     throw new SnowError('NOT_IMPLEMENTED', this.constructor.name, 'exec');
   }
 }

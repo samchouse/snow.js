@@ -2,10 +2,10 @@ import { Collection } from 'discord.js';
 
 import SnowModule from '../struct/SnowModule';
 
-class Category<K, V> extends Collection<K, V> {
+class Category extends Collection<string, SnowModule> {
   public id: string;
 
-  public constructor(id: string, iterable?: Iterable<[K, V]>) {
+  public constructor(id: string, iterable?: Iterable<[string, SnowModule]>) {
     iterable ? super(iterable) : super();
 
     this.id = id;

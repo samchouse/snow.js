@@ -1,7 +1,7 @@
 import { Collection } from 'discord.js';
 import EventEmitter from 'events';
 import path from 'path';
-import readdirp from 'readdirp';
+import fs from 'fs';
 
 import { LoadPredicate, SnowHandlerOptions } from '../typings';
 import Category from '../utils/Category';
@@ -18,7 +18,7 @@ class SnowHandler extends EventEmitter {
   public classToHandle: typeof SnowModule;
   public loadFilter: LoadPredicate;
   public modules: Collection<string, SnowModule>;
-  public categories: Collection<string, Category<string, SnowModule>>;
+  public categories: Collection<string, Category>;
 
   public constructor(
     client: SnowClient,
@@ -42,7 +42,7 @@ class SnowHandler extends EventEmitter {
     this.categories = new Collection();
   }
 
-  public register(mod: SnowModule, filepath?: string) {
+  public register(mod: SnowModule, filepath: string) {
     mod.filepath = filepath;
     mod.client = this.client;
     mod.handler = this;
@@ -50,34 +50,40 @@ class SnowHandler extends EventEmitter {
 
     if (mod.categoryID === 'default' && this.automateCategories) {
       const dirs = path.dirname(filepath).split(path.sep);
-      mod.categoryID = dirs[dirs.length - 1];
+      mod.categoryID = dirs[dirs.length - 1]!;
     }
 
     if (!this.categories.has(mod.categoryID)) {
       this.categories.set(mod.categoryID, new Category(mod.categoryID));
     }
 
-    const category = this.categories.get(mod.categoryID);
+    const category = this.categories.get(mod.categoryID)!;
     mod.category = category;
     category.set(mod.id, mod);
   }
 
   public deregister(mod: SnowModule) {
+    // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
     if (mod.filepath) delete require.cache[require.resolve(mod.filepath)];
     this.modules.delete(mod.id);
-    mod.category.delete(mod.id);
+    mod.category!.delete(mod.id);
   }
 
   public load(filepath: string, isReload = false) {
-    let mod = function findExport(m) {
+    let mod = function findExport(this: SnowHandler, m: any): any {
       if (!m) return null;
       if (m.prototype instanceof this.classToHandle) return m;
       return m.default ? findExport.call(this, m.default) : null;
-    }.call(this, import(filepath));
+      /* eslint-disable @typescript-eslint/no-var-requires */
+      /* eslint-disable @typescript-eslint/no-require-imports */
+    }.call(this, require(filepath));
+    /* eslint-enable @typescript-eslint/no-var-requires */
+    /* eslint-enable @typescript-eslint/no-require-imports */
 
     if (mod && mod.prototype instanceof this.classToHandle) {
       mod = new mod(this);
     } else {
+      // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
       delete require.cache[require.resolve(filepath)];
       return undefined;
     }
@@ -147,13 +153,24 @@ class SnowHandler extends EventEmitter {
     });
   }
 
-  public static async readdirRecursive(directory: string) {
-    const files = await readdirp.promise(directory, {
-      depth: 5,
-      type: 'all'
-    });
+  public static readdirRecursive(directory: string) {
+    const result = [];
 
-    return files.map((file) => file.path);
+    (function read(dir) {
+      const files = fs.readdirSync(dir);
+
+      for (const file of files) {
+        const filepath = path.join(dir, file);
+
+        if (fs.statSync(filepath).isDirectory()) {
+          read(filepath);
+        } else {
+          result.push(filepath);
+        }
+      }
+    })(directory);
+
+    return result;
   }
 }
 

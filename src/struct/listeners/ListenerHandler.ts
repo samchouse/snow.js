@@ -1,11 +1,14 @@
 import SnowError from '../../utils/SnowError';
 import SnowHandler from '../SnowHandler';
-import { isEventEmitter } from '../../utils/Utils';
 import Listener from './Listener';
 import { SnowHandlerOptions } from '../../typings';
 import SnowClient from '../SnowClient';
+import { Collection } from 'discord.js';
+import EventEmitter from 'events';
 
 class ListenerHandler extends SnowHandler {
+  public emitters: Collection<string, EventEmitter>;
+
   public constructor(
     client: SnowClient,
     {
@@ -36,6 +39,9 @@ class ListenerHandler extends SnowHandler {
       automateCategories,
       loadFilter
     });
+
+    this.emitters = new Collection();
+    this.emitters.set('client', this.client);
   }
 
   public override register(listener: Listener, filepath: string) {
@@ -51,14 +57,17 @@ class ListenerHandler extends SnowHandler {
   }
 
   public addToEmitter(id: string) {
-    const listener = this.modules.get(id.toString());
+    const listener = (this.modules as Collection<string, Listener>).get(
+      id.toString()
+    );
     if (!listener)
       throw new SnowError('MODULE_NOT_FOUND', this.classToHandle.name, id);
 
-    const emitter = isEventEmitter(listener.emitter)
-      ? listener.emitter
-      : this.emitters.get(listener.emitter);
-    if (!isEventEmitter(emitter))
+    const emitter =
+      listener.emitter instanceof EventEmitter
+        ? listener.emitter
+        : this.emitters.get(listener.emitter);
+    if (!(emitter instanceof EventEmitter))
       throw new SnowError('INVALID_TYPE', 'emitter', 'EventEmitter', true);
 
     if (listener.type === 'once') {
@@ -71,23 +80,26 @@ class ListenerHandler extends SnowHandler {
   }
 
   public removeFromEmitter(id: string) {
-    const listener = this.modules.get(id.toString());
+    const listener = (this.modules as Collection<string, Listener>).get(
+      id.toString()
+    );
     if (!listener)
       throw new SnowError('MODULE_NOT_FOUND', this.classToHandle.name, id);
 
-    const emitter = isEventEmitter(listener.emitter)
-      ? listener.emitter
-      : this.emitters.get(listener.emitter);
-    if (!isEventEmitter(emitter))
+    const emitter =
+      listener.emitter instanceof EventEmitter
+        ? listener.emitter
+        : this.emitters.get(listener.emitter);
+    if (!(emitter instanceof EventEmitter))
       throw new SnowError('INVALID_TYPE', 'emitter', 'EventEmitter', true);
 
     emitter.removeListener(listener.event, listener.exec);
     return listener;
   }
 
-  public setEmitters(emitters) {
+  public setEmitters(emitters: Record<string, EventEmitter>) {
     for (const [key, value] of Object.entries(emitters)) {
-      if (!isEventEmitter(value))
+      if (!(value instanceof EventEmitter))
         throw new SnowError('INVALID_TYPE', key, 'EventEmitter', true);
       this.emitters.set(key, value);
     }
