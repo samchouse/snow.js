@@ -80,7 +80,7 @@ export interface BaseArgumentOptions {
   name: string;
   type: string;
   description: string;
-  required: boolean;
+  required?: boolean;
 }
 
 export interface SnowHandlerOptions {
