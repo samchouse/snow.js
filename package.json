@@ -15,7 +15,7 @@
   "scripts": {
     "build": "tsc",
     "watch": "tsc --watch",
-    "pub": "yarn build && yarn publish",
+    "pub": "yarn build && yarn publish --no-git-tag-version",
     "lint": "run-s lint:eslint lint:prettier",
     "lint:eslint": "eslint --ignore-path .gitignore --ext .js,.ts,.tsx --fix .",
     "lint:prettier": "prettier --write --ignore-path .gitignore *.json"
