@@ -1,16 +1,21 @@
 {
   "name": "@xenfo/snow.js",
-  "version": "1.0.3",
+  "version": "1.0.5",
   "description": "A Discord.JS framework inspired by Discord-Akairo.",
-  "main": "./dist/src/index.js",
-  "types": "./dist/src/index.d.ts",
   "repository": "https://github.com/Xenfo/snow.js",
   "author": "Samuel Corsi-House <chouse.samuel@gmail.com>",
   "license": "MIT",
+  "main": "./dist/src/index.js",
+  "types": "./dist/src/index.d.ts",
+  "files": [
+    "dist",
+    "LICENSE",
+    "README.md"
+  ],
   "scripts": {
-    "pub": "tsc && cp README.md dist && cp LICENSE dist && yarn publish dist",
     "build": "tsc",
     "watch": "tsc --watch",
+    "pub": "yarn build && yarn publish",
     "lint": "run-s lint:eslint lint:prettier",
     "lint:eslint": "eslint --ignore-path .gitignore --ext .js,.ts,.tsx --fix .",
     "lint:prettier": "prettier --write --ignore-path .gitignore *.json"
