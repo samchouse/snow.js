@@ -1,2 +1,6 @@
+# ---------- Files ----------
+yarn-error.log
+
+# ---------- Directories ----------
 node_modules/
 dist/

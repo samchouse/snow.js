@@ -27,3 +27,47 @@ export {
   Constants,
   version
 };
+
+import {
+  ArgumentOptions,
+  BaseArgumentOptions,
+  BooleanArgumentOptions,
+  ChannelArgumentOptions,
+  CommandHandlerOptions,
+  CommandOptions,
+  InhibitorOptions,
+  IntegerArgumentOptions,
+  ListenerOptions,
+  LoadPredicate,
+  MemberArgumentOptions,
+  MentionableArgumentOptions,
+  NumberArgumentOptions,
+  RoleArgumentOptions,
+  SnowHandlerOptions,
+  SnowModuleOptions,
+  SnowOptions,
+  StringArgumentOptions,
+  UserArgumentOptions
+} from './typings';
+
+export type {
+  ArgumentOptions,
+  BaseArgumentOptions,
+  BooleanArgumentOptions,
+  ChannelArgumentOptions,
+  CommandHandlerOptions,
+  CommandOptions,
+  InhibitorOptions,
+  IntegerArgumentOptions,
+  ListenerOptions,
+  LoadPredicate,
+  MemberArgumentOptions,
+  MentionableArgumentOptions,
+  NumberArgumentOptions,
+  RoleArgumentOptions,
+  SnowHandlerOptions,
+  SnowModuleOptions,
+  SnowOptions,
+  StringArgumentOptions,
+  UserArgumentOptions
+};
