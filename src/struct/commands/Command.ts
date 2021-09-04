@@ -22,7 +22,7 @@ class Command extends SnowModule {
   public ownerOnly: boolean;
   public description: string;
   public name: string | null;
-  public parent: string | null;
+  public parent: { name: string; description: string } | null;
   public args?: ArgumentOptions[];
   public cooldown?: number | null;
   public channel: 'guild' | 'dm' | null;

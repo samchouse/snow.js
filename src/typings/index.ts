@@ -101,7 +101,7 @@ export interface CommandHandlerOptions extends SnowHandlerOptions {
 
 export interface CommandOptions extends SnowModuleOptions {
   name?: string;
-  parent?: string;
+  parent?: { name: string; description: string };
   description?: string;
   args?: ArgumentOptions[];
   channel?: 'guild' | 'dm';

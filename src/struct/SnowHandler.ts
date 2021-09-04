@@ -96,7 +96,10 @@ class SnowHandler extends EventEmitter {
     return mod;
   }
 
-  public loadAll(directory = this.directory, filter = this.loadFilter) {
+  public loadAll(
+    directory = this.directory,
+    filter = this.loadFilter
+  ): this | Promise<this> {
     const filepaths = SnowHandler.readdirRecursive(directory);
     for (let filepath of filepaths) {
       filepath = path.resolve(filepath);
