@@ -1,6 +1,6 @@
 {
   "name": "@xenfo/snow.js",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "A Discord.JS framework inspired by Discord-Akairo.",
   "repository": "https://github.com/Xenfo/snow.js",
   "author": "Samuel Corsi-House <chouse.samuel@gmail.com>",
@@ -13,6 +13,7 @@
     "README.md"
   ],
   "scripts": {
+    "prepare": "is-ci || husky install",
     "build": "tsc",
     "watch": "tsc --watch",
     "pub": "yarn build && yarn publish --no-git-tag-version",
