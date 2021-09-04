@@ -1,10 +1,11 @@
-import SnowError from '../../utils/SnowError';
-import SnowHandler from '../SnowHandler';
-import Listener from './Listener';
-import { SnowHandlerOptions } from '../../typings';
-import SnowClient from '../SnowClient';
 import { Collection } from 'discord.js';
 import EventEmitter from 'events';
+
+import { SnowHandlerOptions } from '../../typings';
+import SnowError from '../../utils/SnowError';
+import SnowClient from '../SnowClient';
+import SnowHandler from '../SnowHandler';
+import Listener from './Listener';
 
 class ListenerHandler extends SnowHandler {
   public emitters: Collection<string, EventEmitter>;
@@ -44,14 +45,14 @@ class ListenerHandler extends SnowHandler {
     this.emitters.set('client', this.client);
   }
 
-  public override register(listener: Listener, filepath: string) {
+  public register(listener: Listener, filepath: string) {
     super.register(listener, filepath);
     listener.exec = listener.exec.bind(listener);
     this.addToEmitter(listener.id);
     return listener;
   }
 
-  public override deregister(listener: Listener) {
+  public deregister(listener: Listener) {
     this.removeFromEmitter(listener.id);
     super.deregister(listener);
   }

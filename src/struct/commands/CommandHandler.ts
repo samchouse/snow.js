@@ -1,10 +1,18 @@
+import { SlashCommandBuilder } from '@discordjs/builders';
+import { REST } from '@discordjs/rest';
+import {
+  APIApplicationCommandOption,
+  ApplicationCommandOptionType,
+  Routes
+} from 'discord-api-types/v9';
 import { Collection, CommandInteraction, Message } from 'discord.js';
+
 import { CommandHandlerOptions } from '../../typings';
 import { BuiltInReasons, CommandHandlerEvents } from '../../utils/Constants';
 import SnowError from '../../utils/SnowError';
-import InhibitorHandler from '../inhibitors/InhibitorHandler';
 import SnowClient from '../SnowClient';
 import SnowHandler from '../SnowHandler';
+import InhibitorHandler from '../inhibitors/InhibitorHandler';
 import Command from './Command';
 
 class CommandHandler extends SnowHandler {
@@ -75,18 +83,351 @@ class CommandHandler extends SnowHandler {
   }
 
   private setup() {
-    this.client.once('ready', () => {
-      this.client.on('message', async (message: Message) => {
+    this.client.once('ready', async () => {
+      this.client.on('messageCreate', async (message: Message) => {
         await this.runAllTypeInhibitors(message);
       });
       this.client.on('interactionCreate', async (interaction) => {
         if (!interaction.isCommand()) return;
         await this.handle(interaction);
       });
+
+      const parents = new Collection<string, Command[]>();
+      const commands = (this.modules as Collection<string, Command>).map(
+        (command) => {
+          if (command.parent) {
+            parents.has(`${command.parent.name}:${command.parent.description}`)
+              ? parents
+                  .get(`${command.parent.name}:${command.parent.description}`)!
+                  .push(command)
+              : parents.set(
+                  `${command.parent.name}:${command.parent.description}`,
+                  [command]
+                );
+
+            return undefined;
+          }
+
+          const slashCommand = new SlashCommandBuilder()
+            .setName(command.name!)
+            .setDescription(command.description);
+
+          if (command.args)
+            command.args.forEach((arg) => {
+              switch (arg.type) {
+                case 'boolean':
+                  slashCommand.addBooleanOption((option) =>
+                    option
+                      .setName(arg.name)
+                      .setDescription(arg.description)
+                      .setRequired(arg.required ?? false)
+                  );
+                  break;
+                case 'integer':
+                  slashCommand.addIntegerOption((option) => {
+                    option
+                      .setName(arg.name)
+                      .setDescription(arg.description)
+                      .setRequired(arg.required ?? false);
+
+                    if (arg.choices)
+                      option.addChoices(
+                        arg.choices.map(({ name, value }) => [name, value])
+                      );
+
+                    return option;
+                  });
+                  break;
+                case 'number':
+                  slashCommand.addNumberOption((option) => {
+                    option
+                      .setName(arg.name)
+                      .setDescription(arg.description)
+                      .setRequired(arg.required ?? false);
+
+                    if (arg.choices)
+                      option.addChoices(
+                        arg.choices.map(({ name, value }) => [name, value])
+                      );
+
+                    return option;
+                  });
+                  break;
+                case 'string':
+                  slashCommand.addStringOption((option) => {
+                    option
+                      .setName(arg.name)
+                      .setDescription(arg.description)
+                      .setRequired(arg.required ?? false);
+
+                    if (arg.choices)
+                      option.addChoices(
+                        arg.choices.map(({ name, value }) => [name, value])
+                      );
+
+                    return option;
+                  });
+                  break;
+                case 'user':
+                  slashCommand.addUserOption((option) =>
+                    option
+                      .setName(arg.name)
+                      .setDescription(arg.description)
+                      .setRequired(arg.required ?? false)
+                  );
+                  break;
+                case 'mentionable':
+                  slashCommand.addMentionableOption((option) =>
+                    option
+                      .setName(arg.name)
+                      .setDescription(arg.description)
+                      .setRequired(arg.required ?? false)
+                  );
+                  break;
+                case 'channel':
+                  slashCommand.addChannelOption((option) =>
+                    option
+                      .setName(arg.name)
+                      .setDescription(arg.description)
+                      .setRequired(arg.required ?? false)
+                  );
+                  break;
+                case 'role':
+                  slashCommand.addRoleOption((option) =>
+                    option
+                      .setName(arg.name)
+                      .setDescription(arg.description)
+                      .setRequired(arg.required ?? false)
+                  );
+                  break;
+                case 'member':
+                  slashCommand.addUserOption((option) =>
+                    option
+                      .setName(arg.name)
+                      .setDescription(arg.description)
+                      .setRequired(arg.required ?? false)
+                  );
+                  break;
+              }
+            });
+
+          return slashCommand;
+        }
+      );
+
+      const commandsWithSubcommands = parents.map((commands, parent) => {
+        const [name, description] = parent.split(':');
+
+        const slashCommand = new SlashCommandBuilder()
+          .setName(name!)
+          .setDescription(description!);
+
+        commands.map((command) => {
+          slashCommand.addSubcommand((subcommand) => {
+            subcommand
+              .setName(command.name!)
+              .setDescription(command.description);
+
+            if (command.args)
+              command.args.forEach((arg) => {
+                switch (arg.type) {
+                  case 'boolean':
+                    subcommand.addBooleanOption((option) =>
+                      option
+                        .setName(arg.name)
+                        .setDescription(arg.description)
+                        .setRequired(arg.required ?? false)
+                    );
+                    break;
+                  case 'integer':
+                    subcommand.addIntegerOption((option) => {
+                      option
+                        .setName(arg.name)
+                        .setDescription(arg.description)
+                        .setRequired(arg.required ?? false);
+
+                      if (arg.choices)
+                        option.addChoices(
+                          arg.choices.map(({ name, value }) => [name, value])
+                        );
+
+                      return option;
+                    });
+                    break;
+                  case 'number':
+                    subcommand.addNumberOption((option) => {
+                      option
+                        .setName(arg.name)
+                        .setDescription(arg.description)
+                        .setRequired(arg.required ?? false);
+
+                      if (arg.choices)
+                        option.addChoices(
+                          arg.choices.map(({ name, value }) => [name, value])
+                        );
+
+                      return option;
+                    });
+                    break;
+                  case 'string':
+                    subcommand.addStringOption((option) => {
+                      option
+                        .setName(arg.name)
+                        .setDescription(arg.description)
+                        .setRequired(arg.required ?? false);
+
+                      if (arg.choices)
+                        option.addChoices(
+                          arg.choices.map(({ name, value }) => [name, value])
+                        );
+
+                      return option;
+                    });
+                    break;
+                  case 'user':
+                    subcommand.addUserOption((option) =>
+                      option
+                        .setName(arg.name)
+                        .setDescription(arg.description)
+                        .setRequired(arg.required ?? false)
+                    );
+                    break;
+                  case 'mentionable':
+                    subcommand.addMentionableOption((option) =>
+                      option
+                        .setName(arg.name)
+                        .setDescription(arg.description)
+                        .setRequired(arg.required ?? false)
+                    );
+                    break;
+                  case 'channel':
+                    subcommand.addChannelOption((option) =>
+                      option
+                        .setName(arg.name)
+                        .setDescription(arg.description)
+                        .setRequired(arg.required ?? false)
+                    );
+                    break;
+                  case 'role':
+                    subcommand.addRoleOption((option) =>
+                      option
+                        .setName(arg.name)
+                        .setDescription(arg.description)
+                        .setRequired(arg.required ?? false)
+                    );
+                    break;
+                  case 'member':
+                    subcommand.addUserOption((option) =>
+                      option
+                        .setName(arg.name)
+                        .setDescription(arg.description)
+                        .setRequired(arg.required ?? false)
+                    );
+                    break;
+                }
+              });
+
+            return subcommand;
+          });
+        });
+
+        return slashCommand;
+      });
+
+      let filtered = commands.filter(
+        (command) => command !== undefined
+      ) as SlashCommandBuilder[];
+      filtered = filtered.concat(commandsWithSubcommands);
+
+      const rest = new REST({ version: '9' }).setToken(this.client.token!);
+
+      try {
+        const jsonCommands = filtered.map((command) => command.toJSON());
+
+        const apiCommands = (await rest.get(
+          Routes.applicationCommands(this.client.user!.id)
+        )) as {
+          name: string;
+          description: string;
+          options: APIApplicationCommandOption[] | undefined;
+        }[];
+
+        const unchangedCommands = jsonCommands.filter((command) =>
+          apiCommands.find(
+            (apiCommand) =>
+              apiCommand.name === command.name &&
+              apiCommand.description === command.description &&
+              apiCommand.options?.length === command.options.length &&
+              !apiCommand.options
+                .map((option) => {
+                  const found = command.options.find((o) => {
+                    const initialChecks =
+                      o.name === option.name &&
+                      o.description === option.description &&
+                      o.type === option.type &&
+                      o.required === option.required;
+
+                    const choicesCheck =
+                      (o.type === ApplicationCommandOptionType.String ||
+                        o.type === ApplicationCommandOptionType.Integer ||
+                        o.type === ApplicationCommandOptionType.Number) &&
+                      (option.type === ApplicationCommandOptionType.String ||
+                        option.type === ApplicationCommandOptionType.Integer ||
+                        option.type === ApplicationCommandOptionType.Number) &&
+                      o.choices &&
+                      option.choices &&
+                      o.choices.length === option.choices.length &&
+                      !o.choices
+                        .map((choice) => {
+                          const foundChoice = option.choices!.find(
+                            (c) =>
+                              c.name === choice.name && c.value === choice.value
+                          );
+
+                          return foundChoice ? true : false;
+                        })
+                        .includes(false);
+
+                    return initialChecks && choicesCheck;
+                  });
+
+                  return found ? true : false;
+                })
+                .includes(false)
+          )
+        );
+
+        if (
+          !unchangedCommands.length ||
+          (unchangedCommands.length === jsonCommands.length &&
+            unchangedCommands.length === apiCommands.length)
+        ) {
+          if (
+            process.env['NODE_ENV'] === 'development' &&
+            this.client.testingGuildID
+          ) {
+            await rest.put(
+              Routes.applicationGuildCommands(
+                this.client.user!.id,
+                '845010274665889812'
+              ),
+              {
+                body: jsonCommands
+              }
+            );
+          } else {
+            await rest.put(Routes.applicationCommands(this.client.user!.id), {
+              body: jsonCommands
+            });
+          }
+        }
+      } catch (err) {
+        console.error(err);
+      }
     });
   }
 
-  public override register(command: Command, filepath: string) {
+  public register(command: Command, filepath: string) {
     super.register(command, filepath);
 
     if (!command.name) throw new Error(`No name for ${command.id}`);
@@ -105,7 +446,7 @@ class CommandHandler extends SnowHandler {
     this.commands.set(command.id.toLowerCase(), command.name.toLowerCase());
   }
 
-  public override deregister(command: Command) {
+  public deregister(command: Command) {
     this.commands.delete(command.id.toLowerCase());
 
     super.deregister(command);
@@ -410,12 +751,17 @@ class CommandHandler extends SnowHandler {
   }
 
   public parseCommand(interaction: CommandInteraction) {
-    const name = interaction.options.getSubcommand()
-      ? interaction.options.getSubcommand()
-      : interaction.commandName;
-
-    const result = (this.modules as Collection<string, Command>).get(name);
+    const result = (this.modules as Collection<string, Command>).get(
+      interaction.commandName
+    );
     if (result) return result;
+
+    try {
+      const result = (this.modules as Collection<string, Command>).get(
+        interaction.options.getSubcommand()
+      );
+      if (result) return result;
+    } catch {}
 
     return null;
   }

@@ -18,6 +18,7 @@ export type ArgumentOptions =
 
 export interface SnowOptions {
   ownerID?: Snowflake | Snowflake[];
+  testingGuildID?: Snowflake;
 }
 
 export interface SnowModuleOptions {
@@ -101,7 +102,7 @@ export interface CommandHandlerOptions extends SnowHandlerOptions {
 
 export interface CommandOptions extends SnowModuleOptions {
   name?: string;
-  parent?: string;
+  parent?: { name: string; description: string };
   description?: string;
   args?: ArgumentOptions[];
   channel?: 'guild' | 'dm';

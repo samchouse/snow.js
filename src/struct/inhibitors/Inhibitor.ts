@@ -1,8 +1,9 @@
 import { CommandInteraction, Message } from 'discord.js';
+
 import { InhibitorOptions } from '../../typings';
 import SnowError from '../../utils/SnowError';
-import Command from '../commands/Command';
 import SnowModule from '../SnowModule';
+import Command from '../commands/Command';
 
 class Inhibitor extends SnowModule {
   public reason: string;

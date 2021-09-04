@@ -4,13 +4,15 @@ import { SnowOptions } from '../typings';
 
 class SnowClient extends Client {
   public ownerID: Snowflake | Snowflake[];
+  public testingGuildID?: Snowflake;
 
   public constructor(options: SnowOptions = {}, clientOptions: ClientOptions) {
     super(clientOptions);
 
-    const { ownerID = '' } = options;
+    const { ownerID = '', testingGuildID } = options;
 
     this.ownerID = ownerID;
+    this.testingGuildID = testingGuildID;
   }
 
   public isOwner(user: string | User) {

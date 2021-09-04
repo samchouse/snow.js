@@ -12,6 +12,7 @@ import {
   User,
   Snowflake
 } from 'discord.js';
+
 import { ArgumentOptions, CommandOptions } from '../../typings';
 import SnowError from '../../utils/SnowError';
 import SnowModule from '../SnowModule';
@@ -22,7 +23,7 @@ class Command extends SnowModule {
   public ownerOnly: boolean;
   public description: string;
   public name: string | null;
-  public parent: string | null;
+  public parent: { name: string; description: string } | null;
   public args?: ArgumentOptions[];
   public cooldown?: number | null;
   public channel: 'guild' | 'dm' | null;
