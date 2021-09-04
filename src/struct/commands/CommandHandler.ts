@@ -1,6 +1,10 @@
 import { Collection, CommandInteraction, Message } from 'discord.js';
 import { REST } from '@discordjs/rest';
-import { Routes } from 'discord-api-types/v9';
+import {
+  APIApplicationCommandOption,
+  ApplicationCommandOptionType,
+  Routes
+} from 'discord-api-types/v9';
 import { CommandHandlerOptions } from '../../typings';
 import { BuiltInReasons, CommandHandlerEvents } from '../../utils/Constants';
 import SnowError from '../../utils/SnowError';
@@ -364,9 +368,69 @@ class CommandHandler extends SnowHandler {
     const rest = new REST({ version: '9' }).setToken(this.client.token!);
 
     try {
-      await rest.put(Routes.applicationCommands(this.client.user!.id), {
-        body: filtered.map((command) => command.toJSON())
-      });
+      const jsonCommands = filtered.map((command) => command.toJSON());
+
+      const apiCommands = (await rest.get(
+        Routes.applicationCommands(this.client.user!.id)
+      )) as {
+        name: string;
+        description: string;
+        options: APIApplicationCommandOption[];
+      }[];
+
+      const unchangedCommands = jsonCommands.filter((command) =>
+        apiCommands.find(
+          (apiCommand) =>
+            apiCommand.name === command.name &&
+            apiCommand.description === command.description &&
+            apiCommand.options.length === command.options.length &&
+            !apiCommand.options
+              .map((option) => {
+                const found = command.options.find((o) => {
+                  const initialChecks =
+                    o.name === option.name &&
+                    o.description === option.description &&
+                    o.type === option.type &&
+                    o.required === option.required;
+
+                  const choicesCheck =
+                    (o.type === ApplicationCommandOptionType.String ||
+                      o.type === ApplicationCommandOptionType.Integer ||
+                      o.type === ApplicationCommandOptionType.Number) &&
+                    (option.type === ApplicationCommandOptionType.String ||
+                      option.type === ApplicationCommandOptionType.Integer ||
+                      option.type === ApplicationCommandOptionType.Number) &&
+                    o.choices &&
+                    option.choices &&
+                    o.choices.length === option.choices.length &&
+                    !o.choices
+                      .map((choice) => {
+                        const foundChoice = option.choices!.find(
+                          (c) =>
+                            c.name === choice.name && c.value === choice.value
+                        );
+
+                        return foundChoice ? true : false;
+                      })
+                      .includes(false);
+
+                  return initialChecks && choicesCheck;
+                });
+
+                return found ? true : false;
+              })
+              .includes(false)
+        )
+      );
+
+      if (
+        !unchangedCommands.length ||
+        (unchangedCommands.length === jsonCommands.length &&
+          unchangedCommands.length === apiCommands.length)
+      )
+        await rest.put(Routes.applicationCommands(this.client.user!.id), {
+          body: jsonCommands
+        });
     } catch (err) {
       console.error(err);
     }

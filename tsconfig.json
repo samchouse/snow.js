@@ -23,6 +23,6 @@
     "downlevelIteration": true,
     "resolveJsonModule": true
   },
-  "include": ["src", "package.json"],
+  "include": ["src", "package.json", "example"],
   "exclude": ["node_modules", "dist"]
 }
