@@ -1,7 +1,7 @@
 import { Collection } from 'discord.js';
 import EventEmitter from 'events';
-import path from 'path';
 import fs from 'fs';
+import path from 'path';
 
 import { LoadPredicate, SnowHandlerOptions } from '../typings';
 import Category from '../utils/Category';
@@ -96,10 +96,7 @@ class SnowHandler extends EventEmitter {
     return mod;
   }
 
-  public loadAll(
-    directory = this.directory,
-    filter = this.loadFilter
-  ): this | Promise<this> {
+  public loadAll(directory = this.directory, filter = this.loadFilter) {
     const filepaths = SnowHandler.readdirRecursive(directory);
     for (let filepath of filepaths) {
       filepath = path.resolve(filepath);

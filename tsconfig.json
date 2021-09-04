@@ -1,21 +1,20 @@
 {
   "compilerOptions": {
-    "target": "es5",
+    "target": "ES2021",
+    "rootDir": "./",
+    "outDir": "./dist",
     "module": "commonjs",
+    "moduleResolution": "node",
     "declaration": true,
     "declarationMap": true,
     "sourceMap": true,
-    "outDir": "./dist",
-    "rootDir": "./",
     "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
     "noUncheckedIndexedAccess": true,
-    "noImplicitOverride": true,
     "noPropertyAccessFromIndexSignature": true,
-    "moduleResolution": "node",
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
@@ -23,6 +22,6 @@
     "downlevelIteration": true,
     "resolveJsonModule": true
   },
-  "include": ["src", "package.json", "example"],
+  "include": ["src", "package.json"],
   "exclude": ["node_modules", "dist"]
 }

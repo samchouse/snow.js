@@ -14,7 +14,7 @@
   ],
   "scripts": {
     "prepare": "is-ci || husky install",
-    "build": "tsc",
+    "build": "rm -rf dist/ && tsc",
     "watch": "tsc --watch",
     "pub": "yarn build && yarn publish --no-git-tag-version",
     "lint": "run-s lint:eslint lint:prettier",

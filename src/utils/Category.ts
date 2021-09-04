@@ -27,7 +27,7 @@ class Category extends Collection<string, SnowModule> {
     return this;
   }
 
-  public override toString() {
+  public toString() {
     return this.id;
   }
 }

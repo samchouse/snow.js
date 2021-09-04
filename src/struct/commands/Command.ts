@@ -12,6 +12,7 @@ import {
   User,
   Snowflake
 } from 'discord.js';
+
 import { ArgumentOptions, CommandOptions } from '../../typings';
 import SnowError from '../../utils/SnowError';
 import SnowModule from '../SnowModule';

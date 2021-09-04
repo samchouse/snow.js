@@ -36,7 +36,7 @@ class SnowError extends Error {
     this.code = key;
   }
 
-  public override get name() {
+  public get name() {
     return `SnowError [${this.code}]`;
   }
 }

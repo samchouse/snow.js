@@ -1,10 +1,11 @@
-import SnowError from '../../utils/SnowError';
-import SnowHandler from '../SnowHandler';
-import Inhibitor from './Inhibitor';
-import Command from '../commands/Command';
 import { Collection, CommandInteraction, Message } from 'discord.js';
-import SnowClient from '../SnowClient';
+
 import { SnowHandlerOptions } from '../../typings';
+import SnowError from '../../utils/SnowError';
+import SnowClient from '../SnowClient';
+import SnowHandler from '../SnowHandler';
+import Command from '../commands/Command';
+import Inhibitor from './Inhibitor';
 
 class InhibitorHandler extends SnowHandler {
   public constructor(
