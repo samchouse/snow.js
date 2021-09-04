@@ -84,7 +84,7 @@ class CommandHandler extends SnowHandler {
 
   private setup() {
     this.client.once('ready', async () => {
-      this.client.on('message', async (message: Message) => {
+      this.client.on('messageCreate', async (message: Message) => {
         await this.runAllTypeInhibitors(message);
       });
       this.client.on('interactionCreate', async (interaction) => {
@@ -92,16 +92,18 @@ class CommandHandler extends SnowHandler {
         await this.handle(interaction);
       });
 
-      const parents = new Collection<
-        { name: string; description: string },
-        Command[]
-      >();
+      const parents = new Collection<string, Command[]>();
       const commands = (this.modules as Collection<string, Command>).map(
         (command) => {
           if (command.parent) {
-            parents.has(command.parent)
-              ? parents.get(command.parent)!.push(command)
-              : parents.set(command.parent, [command]);
+            parents.has(`${command.parent.name}:${command.parent.description}`)
+              ? parents
+                  .get(`${command.parent.name}:${command.parent.description}`)!
+                  .push(command)
+              : parents.set(
+                  `${command.parent.name}:${command.parent.description}`,
+                  [command]
+                );
 
             return undefined;
           }
@@ -214,9 +216,11 @@ class CommandHandler extends SnowHandler {
       );
 
       const commandsWithSubcommands = parents.map((commands, parent) => {
+        const [name, description] = parent.split(':');
+
         const slashCommand = new SlashCommandBuilder()
-          .setName(parent.name)
-          .setDescription(parent.description);
+          .setName(name!)
+          .setDescription(description!);
 
         commands.map((command) => {
           slashCommand.addSubcommand((subcommand) => {
@@ -330,10 +334,10 @@ class CommandHandler extends SnowHandler {
         return slashCommand;
       });
 
-      const filtered = commands.filter(
+      let filtered = commands.filter(
         (command) => command !== undefined
       ) as SlashCommandBuilder[];
-      filtered.concat(commandsWithSubcommands);
+      filtered = filtered.concat(commandsWithSubcommands);
 
       const rest = new REST({ version: '9' }).setToken(this.client.token!);
 
@@ -345,7 +349,7 @@ class CommandHandler extends SnowHandler {
         )) as {
           name: string;
           description: string;
-          options: APIApplicationCommandOption[];
+          options: APIApplicationCommandOption[] | undefined;
         }[];
 
         const unchangedCommands = jsonCommands.filter((command) =>
@@ -353,7 +357,7 @@ class CommandHandler extends SnowHandler {
             (apiCommand) =>
               apiCommand.name === command.name &&
               apiCommand.description === command.description &&
-              apiCommand.options.length === command.options.length &&
+              apiCommand.options?.length === command.options.length &&
               !apiCommand.options
                 .map((option) => {
                   const found = command.options.find((o) => {
@@ -397,10 +401,26 @@ class CommandHandler extends SnowHandler {
           !unchangedCommands.length ||
           (unchangedCommands.length === jsonCommands.length &&
             unchangedCommands.length === apiCommands.length)
-        )
-          await rest.put(Routes.applicationCommands(this.client.user!.id), {
-            body: jsonCommands
-          });
+        ) {
+          if (
+            process.env['NODE_ENV'] === 'development' &&
+            this.client.testingGuildID
+          ) {
+            await rest.put(
+              Routes.applicationGuildCommands(
+                this.client.user!.id,
+                '845010274665889812'
+              ),
+              {
+                body: jsonCommands
+              }
+            );
+          } else {
+            await rest.put(Routes.applicationCommands(this.client.user!.id), {
+              body: jsonCommands
+            });
+          }
+        }
       } catch (err) {
         console.error(err);
       }
@@ -731,12 +751,17 @@ class CommandHandler extends SnowHandler {
   }
 
   public parseCommand(interaction: CommandInteraction) {
-    const name = interaction.options.getSubcommand()
-      ? interaction.options.getSubcommand()
-      : interaction.commandName;
-
-    const result = (this.modules as Collection<string, Command>).get(name);
+    const result = (this.modules as Collection<string, Command>).get(
+      interaction.commandName
+    );
     if (result) return result;
+
+    try {
+      const result = (this.modules as Collection<string, Command>).get(
+        interaction.options.getSubcommand()
+      );
+      if (result) return result;
+    } catch {}
 
     return null;
   }

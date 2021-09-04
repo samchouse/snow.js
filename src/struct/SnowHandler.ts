@@ -70,6 +70,8 @@ class SnowHandler extends EventEmitter {
   }
 
   public load(filepath: string, isReload = false) {
+    if (!this.extensions.has(path.extname(filepath))) return;
+    if (filepath.endsWith('.d.ts')) return;
     let mod = function findExport(this: SnowHandler, m: any): any {
       if (!m) return null;
       if (m.prototype instanceof this.classToHandle) return m;

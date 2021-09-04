@@ -18,6 +18,7 @@ export type ArgumentOptions =
 
 export interface SnowOptions {
   ownerID?: Snowflake | Snowflake[];
+  testingGuildID?: Snowflake;
 }
 
 export interface SnowModuleOptions {
