@@ -16,7 +16,6 @@ import InhibitorHandler from '../inhibitors/InhibitorHandler';
 import Command from './Command';
 
 class CommandHandler extends SnowHandler {
-  public resolver: any;
   public blockBots: boolean;
   public blockClient: boolean;
   public fetchMembers: boolean;
