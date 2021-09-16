@@ -72,7 +72,8 @@ class Command extends SnowModule {
 
   public exec(
     _interaction: CommandInteraction,
-    _args?: (
+    _args?: Record<
+      string,
       | string
       | number
       | boolean
@@ -84,7 +85,7 @@ class Command extends SnowModule {
       | GuildMember
       | APIInteractionDataResolvedGuildMember
       | null
-    )[]
+    >
   ): any | Promise<any> {
     throw new SnowError('NOT_IMPLEMENTED', this.constructor.name, 'exec');
   }
