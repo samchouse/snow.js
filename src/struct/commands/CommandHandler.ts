@@ -712,30 +712,65 @@ class CommandHandler extends SnowHandler {
   public async runCommand(interaction: CommandInteraction, command: Command) {
     if (command.typing) interaction.channel?.sendTyping();
 
-    const args = command.args?.map((arg) => {
+    const rawArgs = command.args?.map((arg) => {
       switch (arg.type) {
         case 'boolean':
-          return interaction.options.getBoolean(arg.name);
+          return {
+            name: arg.name,
+            value: interaction.options.getBoolean(arg.name)
+          };
         case 'integer':
-          return interaction.options.getInteger(arg.name);
+          return {
+            name: arg.name,
+            value: interaction.options.getInteger(arg.name)
+          };
         case 'number':
-          return interaction.options.getNumber(arg.name);
+          return {
+            name: arg.name,
+            value: interaction.options.getNumber(arg.name)
+          };
         case 'string':
-          return interaction.options.getString(arg.name);
+          return {
+            name: arg.name,
+            value: interaction.options.getString(arg.name)
+          };
         case 'user':
-          return interaction.options.getUser(arg.name);
+          return {
+            name: arg.name,
+            value: interaction.options.getUser(arg.name)
+          };
         case 'mentionable':
-          return interaction.options.getMentionable(arg.name);
+          return {
+            name: arg.name,
+            value: interaction.options.getMentionable(arg.name)
+          };
         case 'channel':
-          return interaction.options.getChannel(arg.name);
+          return {
+            name: arg.name,
+            value: interaction.options.getChannel(arg.name)
+          };
         case 'role':
-          return interaction.options.getRole(arg.name);
+          return {
+            name: arg.name,
+            value: interaction.options.getRole(arg.name)
+          };
         case 'member':
-          return interaction.options.getMember(arg.name);
+          return {
+            name: arg.name,
+            value: interaction.options.getMember(arg.name)
+          };
       }
     });
 
-    this.emit(CommandHandlerEvents.COMMAND_STARTED, interaction, command, args);
+    let args = {};
+    rawArgs?.forEach((arg) => (args = { ...args, [arg.name]: arg.value }));
+
+    this.emit(
+      CommandHandlerEvents.COMMAND_STARTED,
+      interaction,
+      command,
+      rawArgs
+    );
 
     const ret = await command.exec(interaction, args);
 
