@@ -22,7 +22,7 @@ class Command extends SnowModule {
   public ratelimit: number;
   public ownerOnly: boolean;
   public description: string;
-  public name: string | null;
+  public name!: string;
   public parent: { name: string; description: string } | null;
   public args?: ArgumentOptions[];
   public cooldown?: number | null;
@@ -31,12 +31,18 @@ class Command extends SnowModule {
   public userPermissions?: PermissionResolvable | PermissionResolvable[];
   public clientPermissions?: PermissionResolvable | PermissionResolvable[];
 
-  public constructor(id: string, options: CommandOptions = {}) {
+  public constructor(
+    id: string,
+    options: CommandOptions = { name: 'SnowJSCommandHasNoName' }
+  ) {
+    if (options.name === 'SnowJSCommandHasNoName')
+      throw new Error(`Command ${id} has no name`);
+
     super(id, { category: options.category });
 
     const {
+      name,
       args = this.args ?? [],
-      name = null,
       parent = null,
       channel = null,
       ownerOnly = false,

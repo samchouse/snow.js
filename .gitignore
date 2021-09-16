@@ -1,5 +1,6 @@
 # ---------- Files ----------
 yarn-error.log
+*.tgz
 
 # ---------- Directories ----------
 node_modules/

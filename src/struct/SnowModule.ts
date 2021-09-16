@@ -3,28 +3,24 @@ import SnowClient from './SnowClient';
 import SnowHandler from './SnowHandler';
 
 class SnowModule {
-  public category: Category | null;
+  public category!: Category;
   public categoryID: string;
-  public client: SnowClient | null;
-  public filepath: string | null;
-  public handler: SnowHandler | null;
+  public client!: SnowClient;
+  public filepath!: string;
+  public handler!: SnowHandler;
   public id: string;
 
   public constructor(id: string, { category = 'default' } = {}) {
     this.id = id;
     this.categoryID = category;
-    this.category = null;
-    this.filepath = null;
-    this.client = null;
-    this.handler = null;
   }
 
   public reload() {
-    return this.handler?.reload(this.id);
+    return this.handler.reload(this.id);
   }
 
   public remove() {
-    return this.handler?.remove(this.id);
+    return this.handler.remove(this.id);
   }
 
   public toString() {

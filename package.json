@@ -1,6 +1,6 @@
 {
   "name": "@xenfo/snow.js",
-  "version": "1.0.9",
+  "version": "1.0.10",
   "description": "A Discord.JS framework inspired by Discord-Akairo.",
   "repository": "https://github.com/Xenfo/snow.js",
   "author": "Samuel Corsi-House <chouse.samuel@gmail.com>",
@@ -16,6 +16,7 @@
     "prepare": "is-ci || husky install",
     "build": "rm -rf dist/ && tsc",
     "watch": "tsc --watch",
+    "dpack": "yarn build && yarn pack",
     "pub": "yarn build && yarn publish --no-git-tag-version",
     "lint": "run-s lint:eslint lint:prettier",
     "lint:eslint": "eslint --ignore-path .gitignore --ext .js,.ts,.tsx --fix .",
@@ -28,8 +29,6 @@
     "discord.js": "^13.1.0"
   },
   "devDependencies": {
-    "@babel/core": "^7.15.0",
-    "@babel/preset-typescript": "^7.15.0",
     "@trivago/prettier-plugin-sort-imports": "^2.0.4",
     "@types/node": "^16.7.10",
     "@typescript-eslint/eslint-plugin": "^4.30.0",

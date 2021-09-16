@@ -109,7 +109,7 @@ class CommandHandler extends SnowHandler {
           }
 
           const slashCommand = new SlashCommandBuilder()
-            .setName(command.name!)
+            .setName(command.name)
             .setDescription(command.description);
 
           if (command.args)
@@ -225,7 +225,7 @@ class CommandHandler extends SnowHandler {
         commands.map((command) => {
           slashCommand.addSubcommand((subcommand) => {
             subcommand
-              .setName(command.name!)
+              .setName(command.name)
               .setDescription(command.description);
 
             if (command.args)
@@ -436,7 +436,7 @@ class CommandHandler extends SnowHandler {
       id: this.commands.has(command.id.toLowerCase()),
       name:
         typeof this.commands.find(
-          (name) => name === command.name!.toLowerCase()
+          (name) => name === command.name.toLowerCase()
         ) === 'string'
     };
 
