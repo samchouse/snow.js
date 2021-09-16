@@ -101,7 +101,7 @@ export interface CommandHandlerOptions extends SnowHandlerOptions {
 }
 
 export interface CommandOptions extends SnowModuleOptions {
-  name?: string;
+  name: string;
   parent?: { name: string; description: string };
   description?: string;
   args?: ArgumentOptions[];

@@ -5,6 +5,5 @@ module.exports = {
   trailingComma: 'none',
   importOrder: ['^[./]'],
   importOrderSeparation: true,
-  experimentalBabelParserPluginsList: ['typescript'],
   plugins: [require.resolve('@trivago/prettier-plugin-sort-imports')]
 };
