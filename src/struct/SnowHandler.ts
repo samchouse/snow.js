@@ -53,9 +53,8 @@ class SnowHandler extends EventEmitter {
       mod.categoryID = dirs[dirs.length - 1]!;
     }
 
-    if (!this.categories.has(mod.categoryID)) {
+    if (!this.categories.has(mod.categoryID))
       this.categories.set(mod.categoryID, new Category(mod.categoryID));
-    }
 
     const category = this.categories.get(mod.categoryID)!;
     mod.category = category;
