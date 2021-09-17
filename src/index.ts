@@ -8,6 +8,7 @@ import Inhibitor from './struct/inhibitors/Inhibitor';
 import InhibitorHandler from './struct/inhibitors/InhibitorHandler';
 import Listener from './struct/listeners/Listener';
 import ListenerHandler from './struct/listeners/ListenerHandler';
+import Parent from './struct/parents/Parent';
 import {
   ArgumentOptions,
   BaseArgumentOptions,
@@ -45,6 +46,7 @@ export {
   ListenerHandler,
   SnowError,
   Category,
+  Parent,
   Constants,
   version
 };

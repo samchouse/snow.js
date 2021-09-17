@@ -66,7 +66,7 @@ class SnowHandler extends EventEmitter {
     // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
     if (mod.filepath) delete require.cache[require.resolve(mod.filepath)];
     this.modules.delete(mod.id);
-    mod.category!.delete(mod.id);
+    mod.category.delete(mod.id);
   }
 
   public load(filepath: string, isReload = false) {

@@ -715,47 +715,47 @@ class CommandHandler extends SnowHandler {
       switch (arg.type) {
         case 'boolean':
           return {
-            name: arg.name,
+            name: arg.id,
             value: interaction.options.getBoolean(arg.name)
           };
         case 'integer':
           return {
-            name: arg.name,
+            name: arg.id,
             value: interaction.options.getInteger(arg.name)
           };
         case 'number':
           return {
-            name: arg.name,
+            name: arg.id,
             value: interaction.options.getNumber(arg.name)
           };
         case 'string':
           return {
-            name: arg.name,
+            name: arg.id,
             value: interaction.options.getString(arg.name)
           };
         case 'user':
           return {
-            name: arg.name,
+            name: arg.id,
             value: interaction.options.getUser(arg.name)
           };
         case 'mentionable':
           return {
-            name: arg.name,
+            name: arg.id,
             value: interaction.options.getMentionable(arg.name)
           };
         case 'channel':
           return {
-            name: arg.name,
+            name: arg.id,
             value: interaction.options.getChannel(arg.name)
           };
         case 'role':
           return {
-            name: arg.name,
+            name: arg.id,
             value: interaction.options.getRole(arg.name)
           };
         case 'member':
           return {
-            name: arg.name,
+            name: arg.id,
             value: interaction.options.getMember(arg.name)
           };
       }
