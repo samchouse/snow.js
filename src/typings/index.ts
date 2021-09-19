@@ -1,7 +1,10 @@
-import { PermissionResolvable, Snowflake } from 'discord.js';
+import { PermissionResolvable, Snowflake, ClientEvents } from 'discord.js';
 import EventEmitter from 'events';
 
 import SnowModule from '../struct/SnowModule';
+import { CommandHandlerEvents } from '../utils/Constants';
+
+type ValueOf<T> = T[keyof T];
 
 export type LoadPredicate = (filepath: string) => boolean;
 
@@ -72,7 +75,10 @@ export interface InhibitorOptions extends SnowModuleOptions {
 
 export interface ListenerOptions extends SnowModuleOptions {
   emitter?: string | EventEmitter;
-  event?: string;
+  event?:
+    | keyof ClientEvents
+    | ValueOf<typeof CommandHandlerEvents>
+    | 'EventNotSet';
   type?: string;
 }
 

@@ -11,8 +11,15 @@ class Listener extends SnowModule {
 
   public constructor(
     id: string,
-    { category, emitter = '', event = '', type = 'on' }: ListenerOptions = {}
+    {
+      category,
+      emitter = '',
+      event = 'EventNotSet',
+      type = 'on'
+    }: ListenerOptions = {}
   ) {
+    if (event === 'EventNotSet') throw new Error(`Listener ${id} has no event`);
+
     super(id, { category });
 
     this.emitter = emitter;

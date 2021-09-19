@@ -3,6 +3,7 @@ import EventEmitter from 'events';
 import fs from 'fs';
 import path from 'path';
 
+import { Command } from '..';
 import { LoadPredicate, SnowHandlerOptions } from '../typings';
 import Category from '../utils/Category';
 import { SnowHandlerEvents } from '../utils/Constants';
@@ -19,6 +20,12 @@ class SnowHandler extends EventEmitter {
   public loadFilter: LoadPredicate;
   public modules: Collection<string, SnowModule>;
   public categories: Collection<string, Category>;
+
+  private loadedEverything = false;
+
+  public get loaded() {
+    return this.loadedEverything;
+  }
 
   public constructor(
     client: SnowClient,
@@ -92,6 +99,24 @@ class SnowHandler extends EventEmitter {
     if (this.modules.has(mod.id))
       throw new SnowError('ALREADY_LOADED', this.classToHandle.name, mod.id);
 
+    if (
+      mod instanceof Command &&
+      (this.modules as Collection<string, Command>).filter((m) => {
+        const module = mod as Command;
+
+        if (!m.parent && !module.parent) return m.name === module.name;
+
+        if (m.parent && module.parent)
+          return m.parent.name === mod.parent.name && m.name === module.name;
+
+        if ((m.parent && !module.parent) || (!m.parent && module.parent))
+          return false;
+
+        return false;
+      }).size >= 1
+    )
+      throw new SnowError('ALREADY_LOADED', this.classToHandle.name, mod.id);
+
     this.register(mod, filepath);
     this.emit(SnowHandlerEvents.LOAD, mod, isReload);
     return mod;
@@ -103,6 +128,8 @@ class SnowHandler extends EventEmitter {
       filepath = path.resolve(filepath);
       if (filter(filepath)) this.load(filepath);
     }
+
+    this.loadedEverything = true;
 
     return this;
   }
