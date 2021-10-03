@@ -15,9 +15,9 @@ class SnowHandler extends EventEmitter {
   public client: SnowClient;
   public directory: string;
   public extensions: Set<string>;
+  public loadFilter: LoadPredicate;
   public automateCategories: boolean;
   public classToHandle: typeof SnowModule;
-  public loadFilter: LoadPredicate;
   public modules: Collection<string, SnowModule>;
   public categories: Collection<string, Category>;
 
