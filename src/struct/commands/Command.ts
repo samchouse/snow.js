@@ -16,18 +16,20 @@ import {
 import { ArgumentOptions, CommandOptions } from '../../typings';
 import SnowError from '../../utils/SnowError';
 import SnowModule from '../SnowModule';
+import CommandHandler from './CommandHandler';
 
 class Command extends SnowModule {
+  public name!: string;
   public typing: boolean;
   public ratelimit: number;
   public ownerOnly: boolean;
   public description: string;
-  public name!: string;
-  public parent: { name: string; description: string } | null;
+  public handler!: CommandHandler;
   public args?: ArgumentOptions[];
   public cooldown?: number | null;
   public channel: 'guild' | 'dm' | null;
   public ignoreCooldown?: Snowflake | Snowflake[];
+  public parent: { name: string; description: string } | null;
   public userPermissions?: PermissionResolvable | PermissionResolvable[];
   public clientPermissions?: PermissionResolvable | PermissionResolvable[];
 

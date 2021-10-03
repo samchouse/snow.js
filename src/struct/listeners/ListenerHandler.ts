@@ -8,6 +8,7 @@ import SnowHandler from '../SnowHandler';
 import Listener from './Listener';
 
 class ListenerHandler extends SnowHandler {
+  public modules!: Collection<string, Listener>;
   public emitters: Collection<string, EventEmitter>;
 
   public constructor(
@@ -58,9 +59,7 @@ class ListenerHandler extends SnowHandler {
   }
 
   public addToEmitter(id: string) {
-    const listener = (this.modules as Collection<string, Listener>).get(
-      id.toString()
-    );
+    const listener = this.modules.get(id.toString());
     if (!listener)
       throw new SnowError('MODULE_NOT_FOUND', this.classToHandle.name, id);
 
@@ -81,9 +80,7 @@ class ListenerHandler extends SnowHandler {
   }
 
   public removeFromEmitter(id: string) {
-    const listener = (this.modules as Collection<string, Listener>).get(
-      id.toString()
-    );
+    const listener = this.modules.get(id.toString());
     if (!listener)
       throw new SnowError('MODULE_NOT_FOUND', this.classToHandle.name, id);
 

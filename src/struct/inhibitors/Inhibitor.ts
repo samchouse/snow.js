@@ -4,11 +4,13 @@ import { InhibitorOptions } from '../../typings';
 import SnowError from '../../utils/SnowError';
 import SnowModule from '../SnowModule';
 import Command from '../commands/Command';
+import InhibitorHandler from './InhibitorHandler';
 
 class Inhibitor extends SnowModule {
-  public reason: string;
   public type: string;
+  public reason: string;
   public priority: number;
+  public handler!: InhibitorHandler;
 
   public constructor(
     id: string,

@@ -3,12 +3,12 @@ import SnowClient from './SnowClient';
 import SnowHandler from './SnowHandler';
 
 class SnowModule {
-  public category!: Category;
+  public id: string;
+  public filepath!: string;
   public categoryID: string;
   public client!: SnowClient;
-  public filepath!: string;
+  public category!: Category;
   public handler!: SnowHandler;
-  public id: string;
 
   public constructor(id: string, { category = 'default' } = {}) {
     this.id = id;

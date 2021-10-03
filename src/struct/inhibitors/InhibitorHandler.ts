@@ -8,6 +8,8 @@ import Command from '../commands/Command';
 import Inhibitor from './Inhibitor';
 
 class InhibitorHandler extends SnowHandler {
+  public modules!: Collection<string, Inhibitor>;
+
   public constructor(
     client: SnowClient,
     {
@@ -47,9 +49,7 @@ class InhibitorHandler extends SnowHandler {
   ) {
     if (!this.modules.size) return null;
 
-    const inhibitors = (this.modules as Collection<string, Inhibitor>).filter(
-      (i) => i.type === type
-    );
+    const inhibitors = this.modules.filter((i) => i.type === type);
     if (!inhibitors.size) return null;
 
     const promises = [];
