@@ -23,11 +23,11 @@ class Command extends SnowModule {
   public ownerOnly: boolean;
   public description: string;
   public name!: string;
-  public parent: { name: string; description: string } | null;
   public args?: ArgumentOptions[];
   public cooldown?: number | null;
   public channel: 'guild' | 'dm' | null;
   public ignoreCooldown?: Snowflake | Snowflake[];
+  public parent: { name: string; description: string } | null;
   public userPermissions?: PermissionResolvable | PermissionResolvable[];
   public clientPermissions?: PermissionResolvable | PermissionResolvable[];
 
