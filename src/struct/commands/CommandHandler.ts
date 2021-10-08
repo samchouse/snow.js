@@ -1,6 +1,6 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
 import { REST } from '@discordjs/rest';
-import { Routes } from 'discord-api-types';
+import { Routes } from 'discord-api-types/v9';
 import { Collection, CommandInteraction, Message } from 'discord.js';
 import {
   APIApplicationCommandOption,
@@ -432,7 +432,7 @@ class CommandHandler extends SnowHandler {
                 await rest.put(
                   Routes.applicationGuildCommands(
                     this.client.user!.id,
-                    '845010274665889812'
+                    this.client.testingGuildID
                   ),
                   {
                     body: jsonCommands
@@ -461,17 +461,6 @@ class CommandHandler extends SnowHandler {
     super.register(command, filepath);
 
     if (!command.name) throw new Error(`No name for ${command.id}`);
-
-    const conflict = {
-      id: this.commands.has(command.id.toLowerCase()),
-      name:
-        typeof this.commands.find(
-          (name) => name === command.name.toLowerCase()
-        ) === 'string'
-    };
-
-    if (conflict.id || conflict.name)
-      throw new SnowError('ALIAS_CONFLICT', command.id, command.name);
 
     this.commands.set(command.id.toLowerCase(), command.name.toLowerCase());
   }
@@ -814,11 +803,13 @@ class CommandHandler extends SnowHandler {
   }
 
   public parseCommand(interaction: CommandInteraction) {
-    const result = this.modules.get(interaction.commandName);
+    const result = this.modules.find((c) => c.name === interaction.commandName);
     if (result) return result;
 
     try {
-      const result = this.modules.get(interaction.options.getSubcommand());
+      const result = this.modules.find(
+        (c) => c.name === interaction.options.getSubcommand()
+      );
       if (result) return result;
     } catch {}
 
