@@ -427,17 +427,31 @@ class CommandHandler extends SnowHandler {
             ) {
               if (
                 process.env['NODE_ENV'] === 'development' &&
-                this.client.testingGuildID
+                this.client.testingGuildID?.length
               ) {
-                await rest.put(
-                  Routes.applicationGuildCommands(
-                    this.client.user!.id,
-                    this.client.testingGuildID
-                  ),
-                  {
-                    body: jsonCommands
+                if (Array.isArray(this.client.testingGuildID)) {
+                  for (const guildID of this.client.testingGuildID) {
+                    await rest.put(
+                      Routes.applicationGuildCommands(
+                        this.client.user!.id,
+                        guildID
+                      ),
+                      {
+                        body: jsonCommands
+                      }
+                    );
                   }
-                );
+                } else {
+                  await rest.put(
+                    Routes.applicationGuildCommands(
+                      this.client.user!.id,
+                      this.client.testingGuildID
+                    ),
+                    {
+                      body: jsonCommands
+                    }
+                  );
+                }
               } else {
                 await rest.put(
                   Routes.applicationCommands(this.client.user!.id),
@@ -803,15 +817,17 @@ class CommandHandler extends SnowHandler {
   }
 
   public parseCommand(interaction: CommandInteraction) {
-    const result = this.modules.find((c) => c.name === interaction.commandName);
-    if (result) return result;
-
     try {
       const result = this.modules.find(
-        (c) => c.name === interaction.options.getSubcommand()
+        (c) =>
+          c.parent?.name === interaction.commandName &&
+          c.name === interaction.options.getSubcommand()
       );
       if (result) return result;
     } catch {}
+
+    const result = this.modules.find((c) => c.name === interaction.commandName);
+    if (result) return result;
 
     return null;
   }
