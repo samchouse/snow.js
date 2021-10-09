@@ -4,7 +4,7 @@ import { SnowOptions } from '../typings';
 
 class SnowClient extends Client {
   public ownerID: Snowflake | Snowflake[];
-  public testingGuildID?: Snowflake;
+  public testingGuildID?: Snowflake | Snowflake[];
   public timeouts: Set<NodeJS.Timeout>;
   public intervals: Set<NodeJS.Timeout>;
   public immediates: Set<NodeJS.Immediate>;
