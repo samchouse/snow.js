@@ -1,11 +1,11 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
-import { REST } from '@discordjs/rest';
-import { Routes } from 'discord-api-types/v9';
-import { Collection, CommandInteraction, Message } from 'discord.js';
 import {
   APIApplicationCommandOption,
   ApplicationCommandOptionType
-} from 'discord.js/node_modules/discord-api-types/payloads/v9/_interactions/slashCommands';
+} from '@discordjs/builders/node_modules/discord-api-types/payloads/v9/_interactions/slashCommands';
+import { REST } from '@discordjs/rest';
+import { Routes } from 'discord-api-types/v9';
+import { Collection, CommandInteraction, Message } from 'discord.js';
 
 import { CommandHandlerOptions } from '../../typings';
 import { BuiltInReasons, CommandHandlerEvents } from '../../utils/Constants';
