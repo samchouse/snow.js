@@ -826,7 +826,9 @@ class CommandHandler extends SnowHandler {
       if (result) return result;
     } catch {}
 
-    const result = this.modules.find((c) => c.name === interaction.commandName);
+    const result = this.modules.find(
+      (c) => !c.parent && c.name === interaction.commandName
+    );
     if (result) return result;
 
     return null;
