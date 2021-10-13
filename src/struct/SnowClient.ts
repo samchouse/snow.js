@@ -35,6 +35,7 @@ class SnowClient extends Client {
     ...args: any[]
   ) {
     const timeout = setTimeout(() => {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       callback(...args);
       this.timeouts.delete(timeout);
     }, delay);
@@ -52,6 +53,7 @@ class SnowClient extends Client {
     delay?: number,
     ...args: any[]
   ) {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     const interval = setInterval(callback, delay, ...args);
     this.intervals.add(interval);
     return interval;
@@ -63,6 +65,7 @@ class SnowClient extends Client {
   }
 
   public setImmediate(callback: (...args: any[]) => void, ...args: any[]) {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     const immediate = setImmediate(callback, ...args);
     this.immediates.add(immediate);
     return immediate;

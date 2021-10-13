@@ -1,6 +1,7 @@
-import { CommandInteraction, Message } from 'discord.js';
+import { Collection, CommandInteraction, Message } from 'discord.js';
 
 import { InhibitorOptions } from '../../typings';
+import Category from '../../utils/Category';
 import SnowError from '../../utils/SnowError';
 import SnowModule from '../SnowModule';
 import Command from '../commands/Command';
@@ -11,6 +12,7 @@ class Inhibitor extends SnowModule {
   public reason: string;
   public priority: number;
   public handler!: InhibitorHandler;
+  public categories!: Collection<string, Category<string, Inhibitor>>;
 
   public constructor(
     id: string,

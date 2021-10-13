@@ -7,7 +7,7 @@ class SnowModule {
   public filepath!: string;
   public categoryID: string;
   public client!: SnowClient;
-  public category!: Category;
+  public category!: Category<string, SnowModule>;
   public handler!: SnowHandler;
 
   public constructor(id: string, { category = 'default' } = {}) {

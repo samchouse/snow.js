@@ -10,10 +10,12 @@ import {
   PermissionResolvable,
   Role,
   User,
-  Snowflake
+  Snowflake,
+  Collection
 } from 'discord.js';
 
 import { ArgumentOptions, CommandOptions } from '../../typings';
+import Category from '../../utils/Category';
 import SnowError from '../../utils/SnowError';
 import SnowModule from '../SnowModule';
 import CommandHandler from './CommandHandler';
@@ -30,6 +32,7 @@ class Command extends SnowModule {
   public channel: 'guild' | 'dm' | null;
   public ignoreCooldown?: Snowflake | Snowflake[];
   public parent: { name: string; description: string } | null;
+  public categories!: Collection<string, Category<string, Command>>;
   public userPermissions?: PermissionResolvable | PermissionResolvable[];
   public clientPermissions?: PermissionResolvable | PermissionResolvable[];
 
