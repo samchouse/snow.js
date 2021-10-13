@@ -1,5 +1,5 @@
 {
   "README.md": "doctoc",
-  "*.json": "prettier --write --ignore-path .gitignore",
-  "*.ts": "eslint --ignore-path .gitignore --fix"
+  "*.ts": "eslint --ignore-path .gitignore --fix",
+  "*.json": "prettier --write --ignore-path .gitignore"
 }
