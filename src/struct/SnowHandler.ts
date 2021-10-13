@@ -19,7 +19,7 @@ class SnowHandler extends EventEmitter {
   public automateCategories: boolean;
   public classToHandle: typeof SnowModule;
   public modules: Collection<string, SnowModule>;
-  public categories: Collection<string, Category>;
+  public categories: Collection<string, Category<string, SnowModule>>;
 
   private loadedEverything = false;
 
@@ -78,6 +78,7 @@ class SnowHandler extends EventEmitter {
   public load(filepath: string, isReload = false) {
     if (!this.extensions.has(path.extname(filepath))) return;
     if (filepath.endsWith('.d.ts')) return;
+
     let mod = function findExport(this: SnowHandler, m: any): any {
       if (!m) return null;
       if (m.prototype instanceof this.classToHandle) return m;
@@ -96,8 +97,12 @@ class SnowHandler extends EventEmitter {
       return undefined;
     }
 
-    if (this.modules.has(mod.id))
-      throw new SnowError('ALREADY_LOADED', this.classToHandle.name, mod.id);
+    if (this.modules.has(mod.id as string))
+      throw new SnowError(
+        'ALREADY_LOADED',
+        this.classToHandle.name,
+        mod.id as string
+      );
 
     if (
       mod instanceof Command &&
@@ -117,7 +122,7 @@ class SnowHandler extends EventEmitter {
     )
       throw new SnowError('ALREADY_LOADED', this.classToHandle.name, mod.id);
 
-    this.register(mod, filepath);
+    this.register(mod as SnowModule, filepath);
     this.emit(SnowHandlerEvents.LOAD, mod, isReload);
     return mod;
   }

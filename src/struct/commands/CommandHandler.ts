@@ -8,6 +8,7 @@ import { Routes } from 'discord-api-types/v9';
 import { Collection, CommandInteraction, Message } from 'discord.js';
 
 import { CommandHandlerOptions } from '../../typings';
+import Category from '../../utils/Category';
 import { BuiltInReasons, CommandHandlerEvents } from '../../utils/Constants';
 import SnowError from '../../utils/SnowError';
 import SnowClient from '../SnowClient';
@@ -24,6 +25,7 @@ class CommandHandler extends SnowHandler {
   public commands: Collection<string, string>;
   public modules!: Collection<string, Command>;
   public inhibitorHandler: InhibitorHandler | null;
+  public categories!: Collection<string, Category<string, Command>>;
   public cooldowns: Collection<
     string,
     {

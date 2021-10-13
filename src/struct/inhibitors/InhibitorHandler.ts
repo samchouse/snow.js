@@ -1,6 +1,7 @@
 import { Collection, CommandInteraction, Message } from 'discord.js';
 
 import { SnowHandlerOptions } from '../../typings';
+import Category from '../../utils/Category';
 import SnowError from '../../utils/SnowError';
 import SnowClient from '../SnowClient';
 import SnowHandler from '../SnowHandler';
@@ -9,6 +10,7 @@ import Inhibitor from './Inhibitor';
 
 class InhibitorHandler extends SnowHandler {
   public modules!: Collection<string, Inhibitor>;
+  public categories!: Collection<string, Category<string, Inhibitor>>;
 
   public constructor(
     client: SnowClient,

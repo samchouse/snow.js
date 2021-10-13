@@ -2,6 +2,7 @@ import { Collection } from 'discord.js';
 import EventEmitter from 'events';
 
 import { SnowHandlerOptions } from '../../typings';
+import Category from '../../utils/Category';
 import SnowError from '../../utils/SnowError';
 import SnowClient from '../SnowClient';
 import SnowHandler from '../SnowHandler';
@@ -10,6 +11,7 @@ import Listener from './Listener';
 class ListenerHandler extends SnowHandler {
   public modules!: Collection<string, Listener>;
   public emitters: Collection<string, EventEmitter>;
+  public categories!: Collection<string, Category<string, Listener>>;
 
   public constructor(
     client: SnowClient,
