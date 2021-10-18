@@ -7,6 +7,30 @@ on:
     branches: [master, dev]
 
 jobs:
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+          fetch-depth: 0
+
+      - name: Set up Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Git Fetch
+        run: git fetch --no-tags --prune --depth=5 origin master
+
+      - name: Install Dependencies
+        run: yarn -s --frozen-lockfile
+
+      - name: Build Library
+        run: yarn build
+
   lint:
     name: Lint
     runs-on: ubuntu-latest
