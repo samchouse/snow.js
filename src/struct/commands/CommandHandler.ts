@@ -1,10 +1,11 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
-import {
-  APIApplicationCommandOption,
-  ApplicationCommandOptionType
-} from '@discordjs/builders/node_modules/discord-api-types/payloads/v9/_interactions/slashCommands';
 import { REST } from '@discordjs/rest';
-import { Routes } from 'discord-api-types/v9';
+import {
+  Routes,
+  APIApplicationCommandOption,
+  ApplicationCommandOptionType,
+  RESTPostAPIChatInputApplicationCommandsJSONBody
+} from 'discord-api-types/v9';
 import { Collection, CommandInteraction, Message } from 'discord.js';
 
 import { CommandHandlerOptions } from '../../typings';
@@ -363,76 +364,101 @@ class CommandHandler extends SnowHandler {
           const rest = new REST({ version: '9' }).setToken(this.client.token!);
 
           try {
-            const jsonCommands = filtered.map((command) => command.toJSON());
+            const jsonCommands = filtered.map((command) =>
+              command.toJSON()
+            ) as RESTPostAPIChatInputApplicationCommandsJSONBody[];
 
-            const apiCommands = (await rest.get(
-              Routes.applicationCommands(this.client.user!.id)
-            )) as {
-              name: string;
-              description: string;
-              options: APIApplicationCommandOption[] | undefined;
-            }[];
+            const check = async (guildId?: string) => {
+              const apiCommands = guildId
+                ? ((await rest.get(
+                    Routes.applicationGuildCommands(
+                      this.client.user!.id,
+                      guildId
+                    )
+                  )) as {
+                    name: string;
+                    description: string;
+                    options: APIApplicationCommandOption[] | undefined;
+                  }[])
+                : ((await rest.get(
+                    Routes.applicationCommands(this.client.user!.id)
+                  )) as {
+                    name: string;
+                    description: string;
+                    options: APIApplicationCommandOption[] | undefined;
+                  }[]);
 
-            const unchangedCommands = jsonCommands.filter((command) =>
-              apiCommands.find(
-                (apiCommand) =>
-                  apiCommand.name === command.name &&
-                  apiCommand.description === command.description &&
-                  apiCommand.options?.length === command.options.length &&
-                  !apiCommand.options
-                    .map((option) => {
-                      const found = command.options.find((o) => {
-                        const initialChecks =
-                          o.name === option.name &&
-                          o.description === option.description &&
-                          o.type === option.type &&
-                          o.required === option.required;
+              return {
+                apiCommands,
+                unchangedCommands: jsonCommands.filter((command) =>
+                  apiCommands.find(
+                    (apiCommand) =>
+                      apiCommand.name === command.name &&
+                      apiCommand.description === command.description &&
+                      apiCommand.options &&
+                      apiCommand.options.length === command.options?.length &&
+                      !apiCommand.options
+                        .map((option) => {
+                          const found = command.options?.find((o) => {
+                            const initialChecks =
+                              o.name === option.name &&
+                              o.description === option.description &&
+                              o.type === option.type &&
+                              o.required === option.required;
 
-                        const choicesCheck =
-                          (o.type === ApplicationCommandOptionType.String ||
-                            o.type === ApplicationCommandOptionType.Integer ||
-                            o.type === ApplicationCommandOptionType.Number) &&
-                          (option.type ===
-                            ApplicationCommandOptionType.String ||
-                            option.type ===
-                              ApplicationCommandOptionType.Integer ||
-                            option.type ===
-                              ApplicationCommandOptionType.Number) &&
-                          o.choices &&
-                          option.choices &&
-                          o.choices.length === option.choices.length &&
-                          !o.choices
-                            .map((choice) => {
-                              const foundChoice = option.choices!.find(
-                                (c) =>
-                                  c.name === choice.name &&
-                                  c.value === choice.value
-                              );
+                            const choicesCheck =
+                              (o.type === ApplicationCommandOptionType.String ||
+                                o.type ===
+                                  ApplicationCommandOptionType.Integer ||
+                                o.type ===
+                                  ApplicationCommandOptionType.Number) &&
+                              (option.type ===
+                                ApplicationCommandOptionType.String ||
+                                option.type ===
+                                  ApplicationCommandOptionType.Integer ||
+                                option.type ===
+                                  ApplicationCommandOptionType.Number) &&
+                              o.choices &&
+                              option.choices &&
+                              o.choices.length === option.choices.length &&
+                              !o.choices
+                                .map((choice) => {
+                                  const foundChoice = option.choices!.find(
+                                    (c) =>
+                                      c.name === choice.name &&
+                                      c.value === choice.value
+                                  );
 
-                              return foundChoice ? true : false;
-                            })
-                            .includes(false);
+                                  return foundChoice ? true : false;
+                                })
+                                .includes(false);
 
-                        return initialChecks && choicesCheck;
-                      });
+                            return initialChecks && choicesCheck;
+                          });
 
-                      return found ? true : false;
-                    })
-                    .includes(false)
-              )
-            );
+                          return found ? true : false;
+                        })
+                        .includes(false)
+                  )
+                )
+              };
+            };
 
             if (
-              !unchangedCommands.length ||
-              (unchangedCommands.length === jsonCommands.length &&
-                unchangedCommands.length === apiCommands.length)
+              process.env['NODE_ENV'] === 'development' &&
+              this.client.testingGuildID?.length
             ) {
-              if (
-                process.env['NODE_ENV'] === 'development' &&
-                this.client.testingGuildID?.length
-              ) {
-                if (Array.isArray(this.client.testingGuildID)) {
-                  for (const guildID of this.client.testingGuildID) {
+              if (Array.isArray(this.client.testingGuildID)) {
+                for (const guildID of this.client.testingGuildID) {
+                  const { apiCommands, unchangedCommands } = await check(
+                    guildID
+                  );
+
+                  if (
+                    !unchangedCommands.length ||
+                    (unchangedCommands.length === jsonCommands.length &&
+                      unchangedCommands.length === apiCommands.length)
+                  )
                     await rest.put(
                       Routes.applicationGuildCommands(
                         this.client.user!.id,
@@ -442,8 +468,17 @@ class CommandHandler extends SnowHandler {
                         body: jsonCommands
                       }
                     );
-                  }
-                } else {
+                }
+              } else {
+                const { apiCommands, unchangedCommands } = await check(
+                  this.client.testingGuildID
+                );
+
+                if (
+                  !unchangedCommands.length ||
+                  (unchangedCommands.length === jsonCommands.length &&
+                    unchangedCommands.length === apiCommands.length)
+                )
                   await rest.put(
                     Routes.applicationGuildCommands(
                       this.client.user!.id,
@@ -453,15 +488,21 @@ class CommandHandler extends SnowHandler {
                       body: jsonCommands
                     }
                   );
-                }
-              } else {
+              }
+            } else {
+              const { apiCommands, unchangedCommands } = await check();
+
+              if (
+                !unchangedCommands.length ||
+                (unchangedCommands.length === jsonCommands.length &&
+                  unchangedCommands.length === apiCommands.length)
+              )
                 await rest.put(
                   Routes.applicationCommands(this.client.user!.id),
                   {
                     body: jsonCommands
                   }
                 );
-              }
             }
           } catch (err) {
             console.error(err);
