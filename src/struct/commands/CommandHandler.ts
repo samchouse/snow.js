@@ -1,10 +1,10 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
 import { REST } from '@discordjs/rest';
 import {
-  Routes,
   APIApplicationCommandOption,
   ApplicationCommandOptionType,
-  RESTPostAPIChatInputApplicationCommandsJSONBody
+  RESTPostAPIChatInputApplicationCommandsJSONBody,
+  Routes
 } from 'discord-api-types/v9';
 import { Collection, CommandInteraction, Message } from 'discord.js';
 
@@ -530,12 +530,7 @@ class CommandHandler extends SnowHandler {
 
   public async handle(interaction: CommandInteraction) {
     try {
-      if (
-        this.fetchMembers &&
-        interaction.guild &&
-        !interaction.member &&
-        !interaction.webhook.id
-      )
+      if (this.fetchMembers && interaction.guild && !interaction.webhook.id)
         await interaction.guild.members.fetch(interaction.user);
 
       if (await this.runAllTypeInhibitors(interaction)) return false;
