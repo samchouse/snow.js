@@ -1,4 +1,4 @@
-import { PermissionResolvable, Snowflake, ClientEvents } from 'discord.js';
+import { ClientEvents, PermissionResolvable, Snowflake } from 'discord.js';
 import EventEmitter from 'events';
 
 import SnowModule from '../struct/SnowModule';

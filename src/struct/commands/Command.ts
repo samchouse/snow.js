@@ -4,14 +4,14 @@ import {
   APIRole
 } from 'discord-api-types/v9';
 import {
+  Collection,
   CommandInteraction,
   GuildChannel,
   GuildMember,
   PermissionResolvable,
   Role,
-  User,
   Snowflake,
-  Collection
+  User
 } from 'discord.js';
 
 import { ArgumentOptions, CommandOptions } from '../../typings';
