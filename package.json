@@ -1,6 +1,6 @@
 {
   "name": "@xenfo/snow.js",
-  "version": "1.0.21",
+  "version": "1.1.0",
   "description": "A Discord.JS framework inspired by Discord-Akairo.",
   "repository": "https://github.com/Xenfo/snow.js",
   "author": "Samuel Corsi-House <chouse.samuel@gmail.com>",
@@ -23,26 +23,26 @@
     "lint:prettier": "prettier --write --ignore-path .gitignore *.json"
   },
   "dependencies": {
-    "@discordjs/builders": "^0.8.1",
+    "@discordjs/builders": "^0.8.2",
     "@discordjs/rest": "^0.1.0-canary.0",
     "discord-api-types": "^0.24.0",
-    "discord.js": "^13.3.0"
+    "discord.js": "^13.3.1"
   },
   "devDependencies": {
-    "@trivago/prettier-plugin-sort-imports": "^3.0.0",
-    "@types/node": "^16.11.6",
-    "@typescript-eslint/eslint-plugin": "^5.2.0",
-    "@typescript-eslint/parser": "^5.2.0",
+    "@trivago/prettier-plugin-sort-imports": "^3.1.1",
+    "@types/node": "^16.11.7",
+    "@typescript-eslint/eslint-plugin": "^5.3.1",
+    "@typescript-eslint/parser": "^5.3.1",
     "commitizen": "^4.2.4",
     "cz-conventional-changelog": "^3.3.0",
     "doctoc": "^2.1.0",
-    "eslint": "^8.1.0",
+    "eslint": "^8.2.0",
     "eslint-config-marine": "^9.0.6",
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-prettier": "^4.0.0",
     "husky": "^7.0.4",
     "is-ci": "^3.0.1",
-    "lint-staged": "^12.0.0",
+    "lint-staged": "^12.0.2",
     "npm-run-all": "^4.1.5",
     "prettier": "^2.4.1",
     "typescript": "^4.4.4"
