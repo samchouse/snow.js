@@ -99,7 +99,7 @@ class CommandHandler extends SnowHandler {
       });
 
       // eslint-disable-next-line @typescript-eslint/no-misused-promises
-      this.client.setInterval(async () => {
+      const interval = this.client.setInterval(async () => {
         const registerCommand = async () => {
           this.registeredAllCommands = true;
 
@@ -509,7 +509,10 @@ class CommandHandler extends SnowHandler {
           }
         };
 
-        if (this.loaded && !this.registeredAllCommands) await registerCommand();
+        if (this.loaded && !this.registeredAllCommands) {
+          await registerCommand();
+          return this.client.clearInterval(interval);
+        }
       }, 10);
     });
   }
