@@ -108,15 +108,17 @@ export interface CommandHandlerOptions extends SnowHandlerOptions {
 
 export interface CommandOptions extends SnowModuleOptions {
   name: string;
-  parent?: { name: string; description: string };
-  description?: string;
-  args?: ArgumentOptions[];
-  channel?: 'guild' | 'dm';
+  typing?: boolean;
   cooldown?: number;
   ratelimit?: number;
-  typing?: boolean;
   ownerOnly?: boolean;
+  description?: string;
+  channel?: 'guild' | 'dm';
+  args?: ArgumentOptions[];
+  defaultPermission?: boolean;
   ignoreCooldown?: Snowflake | Snowflake[];
-  clientPermissions?: PermissionResolvable | PermissionResolvable[];
+  parent?: { name: string; description: string };
   userPermissions?: PermissionResolvable | PermissionResolvable[];
+  clientPermissions?: PermissionResolvable | PermissionResolvable[];
+  permissions?: { id: string; type: 'ROLE' | 'USER'; permission: boolean }[];
 }
