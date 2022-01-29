@@ -1,0 +1,4 @@
+# ---------- Folders ----------
+.swc/
+dist/
+node_modules/
