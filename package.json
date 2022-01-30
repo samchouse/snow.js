@@ -12,7 +12,7 @@
     "build": "tsup",
     "watch": "tsup --watch",
     "lint": "eslint --fix --ignore-path .gitignore .",
-    "format": "prettier --write --ignore-path .gitignore ."
+    "format": "prettier --write --ignore-path .prettierignore ."
   },
   "devDependencies": {
     "@commitlint/cli": "^16.1.0",
@@ -31,6 +31,7 @@
     "eslint-plugin-prettier": "^4.0.0",
     "husky": "^7.0.4",
     "is-ci": "^3.0.1",
+    "lint-staged": "^12.3.2",
     "prettier": "^2.5.1",
     "tslib": "^2.3.1",
     "tsup": "^5.11.12",
