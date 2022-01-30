@@ -12,7 +12,8 @@
     "build": "tsup",
     "watch": "tsup --watch",
     "lint": "eslint --fix --ignore-path .gitignore .",
-    "format": "prettier --write --ignore-path .prettierignore ."
+    "format": "prettier --write --ignore-path .prettierignore .",
+    "changelog": "git cliff -u --prepend ./CHANGELOG.md"
   },
   "devDependencies": {
     "@commitlint/cli": "^16.1.0",
