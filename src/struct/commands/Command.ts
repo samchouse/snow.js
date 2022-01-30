@@ -8,39 +8,44 @@ import {
   CommandInteraction,
   GuildChannel,
   GuildMember,
-  PermissionResolvable,
   Role,
-  Snowflake,
   User
 } from 'discord.js';
 
-import { ArgumentOptions, CommandOptions } from '../../typings';
+import { CommandOptions } from '../../typings';
 import Category from '../../utils/Category';
 import SnowError from '../../utils/SnowError';
 import SnowModule from '../SnowModule';
 import CommandHandler from './CommandHandler';
 
 class Command extends SnowModule {
-  public name!: string;
-  public typing: boolean;
-  public ratelimit: number;
-  public ownerOnly: boolean;
-  public description: string;
   public handler!: CommandHandler;
-  public args?: ArgumentOptions[];
-  public cooldown?: number | null;
-  public channel: 'guild' | 'dm' | null;
-  public ignoreCooldown?: Snowflake | Snowflake[];
-  public parent: { name: string; description: string } | null;
+  public name: CommandOptions['name'];
+  public args: CommandOptions['args'];
+  public parent: CommandOptions['parent'];
+  public typing: CommandOptions['typing'];
+  public channel: CommandOptions['channel'];
+  public cooldown: CommandOptions['cooldown'];
+  public ratelimit: CommandOptions['ratelimit'];
+  public ownerOnly: CommandOptions['ownerOnly'];
+  public description: CommandOptions['description'];
+  public permissions: CommandOptions['permissions'];
+  public ignoreCooldown: CommandOptions['ignoreCooldown'];
+  public userPermissions: CommandOptions['userPermissions'];
+  public defaultPermission: CommandOptions['defaultPermission'];
+  public clientPermissions: CommandOptions['clientPermissions'];
   public categories!: Collection<string, Category<string, Command>>;
-  public userPermissions?: PermissionResolvable | PermissionResolvable[];
-  public clientPermissions?: PermissionResolvable | PermissionResolvable[];
 
   public constructor(
     id: string,
-    options: CommandOptions = { name: 'SnowJSCommandHasNoName' }
+    options: CommandOptions = {
+      name: 'SnowJSCommandHasNoName',
+      description: 'SnowJSCommandHasNoDescription'
+    }
   ) {
     if (options.name === 'SnowJSCommandHasNoName')
+      throw new Error(`Command ${id} has no name`);
+    if (options.description === 'SnowJSCommandHasNoDescription')
       throw new Error(`Command ${id} has no name`);
 
     super(id, { category: options.category });
@@ -48,16 +53,18 @@ class Command extends SnowModule {
     const {
       name,
       args = this.args ?? [],
-      parent = null,
-      channel = null,
+      parent,
+      channel,
       ownerOnly = false,
       typing = false,
-      cooldown = null,
+      cooldown,
       ratelimit = 1,
       description = '',
       clientPermissions = this.clientPermissions,
       userPermissions = this.userPermissions,
-      ignoreCooldown
+      ignoreCooldown,
+      defaultPermission = true,
+      permissions = []
     } = options;
 
     this.name = name;
@@ -69,10 +76,11 @@ class Command extends SnowModule {
     this.ratelimit = ratelimit;
     this.ownerOnly = ownerOnly;
     this.description = description;
-
-    this.clientPermissions = clientPermissions;
-    this.userPermissions = userPermissions;
+    this.permissions = permissions;
     this.ignoreCooldown = ignoreCooldown;
+    this.userPermissions = userPermissions;
+    this.clientPermissions = clientPermissions;
+    this.defaultPermission = defaultPermission;
   }
 
   public exec(

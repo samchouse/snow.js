@@ -537,7 +537,6 @@ class CommandHandler extends SnowHandler {
         await interaction.guild.members.fetch(interaction.user);
 
       if (await this.runAllTypeInhibitors(interaction)) return false;
-
       if (await this.runPreTypeInhibitors(interaction)) return false;
 
       const command = this.parseCommand(interaction);
@@ -769,7 +768,7 @@ class CommandHandler extends SnowHandler {
 
     const entry = this.cooldowns.get(id)![command.id]!;
 
-    if (entry.uses >= command.ratelimit) {
+    if (command.ratelimit && entry.uses >= command.ratelimit) {
       const end = entry.end;
       const diff = end - interaction.createdTimestamp;
 
@@ -782,7 +781,7 @@ class CommandHandler extends SnowHandler {
   }
 
   public async runCommand(interaction: CommandInteraction, command: Command) {
-    if (command.typing) interaction.channel?.sendTyping();
+    if (command.typing) await interaction.channel?.sendTyping();
 
     const rawArgs = command.args?.map((arg) => {
       switch (arg.type) {
