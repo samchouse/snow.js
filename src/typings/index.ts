@@ -111,8 +111,8 @@ export interface CommandOptions extends SnowModuleOptions {
   typing?: boolean;
   cooldown?: number;
   ratelimit?: number;
+  description: string;
   ownerOnly?: boolean;
-  description?: string;
   channel?: 'guild' | 'dm';
   args?: ArgumentOptions[];
   defaultPermission?: boolean;

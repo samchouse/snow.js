@@ -38,9 +38,14 @@ class Command extends SnowModule {
 
   public constructor(
     id: string,
-    options: CommandOptions = { name: 'SnowJSCommandHasNoName' }
+    options: CommandOptions = {
+      name: 'SnowJSCommandHasNoName',
+      description: 'SnowJSCommandHasNoDescription'
+    }
   ) {
     if (options.name === 'SnowJSCommandHasNoName')
+      throw new Error(`Command ${id} has no name`);
+    if (options.description === 'SnowJSCommandHasNoDescription')
       throw new Error(`Command ${id} has no name`);
 
     super(id, { category: options.category });
