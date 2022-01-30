@@ -2,7 +2,6 @@
 
 ![GitHub](https://img.shields.io/github/license/Xenfo/snow.js)
 [![Commitizen friendly](https://img.shields.io/badge/commitizen-friendly-brightgreen.svg)](http://commitizen.github.io/cz-cli/)
-[![Known Vulnerabilities](https://snyk.io/test/github/Xenfo/snow.js/badge.svg)](https://snyk.io/test/github/Xenfo/snow.js)
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
