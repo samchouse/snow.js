@@ -1,0 +1,5 @@
+# ---------- Folders ----------
+.swc/
+dist/
+node_modules/
+.github/workflows/
