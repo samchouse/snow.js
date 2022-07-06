@@ -79,17 +79,19 @@ class SnowHandler extends EventEmitter {
     if (!this.extensions.has(path.extname(filepath))) return;
     if (filepath.endsWith('.d.ts')) return;
 
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     let mod = function findExport(this: SnowHandler, m: any): any {
       if (!m) return null;
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
       if (m.prototype instanceof this.classToHandle) return m;
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
       return m.default ? findExport.call(this, m.default) : null;
-      /* eslint-disable @typescript-eslint/no-var-requires */
-      /* eslint-disable @typescript-eslint/no-require-imports */
+      // eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/no-var-requires
     }.call(this, require(filepath));
-    /* eslint-enable @typescript-eslint/no-var-requires */
-    /* eslint-enable @typescript-eslint/no-require-imports */
 
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
     if (mod && mod.prototype instanceof this.classToHandle) {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
       mod = new mod(this);
     } else {
       // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
@@ -97,10 +99,12 @@ class SnowHandler extends EventEmitter {
       return undefined;
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
     if (this.modules.has(mod.id as string))
       throw new SnowError(
         'ALREADY_LOADED',
         this.classToHandle.name,
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
         mod.id as string
       );
 
@@ -112,6 +116,7 @@ class SnowHandler extends EventEmitter {
         if (!m.parent && !module.parent) return m.name === module.name;
 
         if (m.parent && module.parent)
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
           return m.parent.name === mod.parent.name && m.name === module.name;
 
         if ((m.parent && !module.parent) || (!m.parent && module.parent))
@@ -124,7 +129,7 @@ class SnowHandler extends EventEmitter {
 
     this.register(mod as SnowModule, filepath);
     this.emit(SnowHandlerEvents.LOAD, mod, isReload);
-    return mod;
+    return mod as SnowModule;
   }
 
   public loadAll(directory = this.directory, filter = this.loadFilter) {
@@ -181,9 +186,9 @@ class SnowHandler extends EventEmitter {
   }
 
   public findCategory(name: string) {
-    return this.categories.find((category) => {
-      return category.id.toLowerCase() === name.toLowerCase();
-    });
+    return this.categories.find(
+      (category) => category.id.toLowerCase() === name.toLowerCase()
+    );
   }
 
   public static readdirRecursive(directory: string) {

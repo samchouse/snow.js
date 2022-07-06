@@ -144,10 +144,7 @@ class CommandHandler extends SnowHandler {
                         .setDescription(arg.description)
                         .setRequired(arg.required ?? false);
 
-                      if (arg.choices)
-                        option.addChoices(
-                          arg.choices.map(({ name, value }) => [name, value])
-                        );
+                      if (arg.choices) option.addChoices(...arg.choices);
 
                       return option;
                     });
@@ -159,10 +156,7 @@ class CommandHandler extends SnowHandler {
                         .setDescription(arg.description)
                         .setRequired(arg.required ?? false);
 
-                      if (arg.choices)
-                        option.addChoices(
-                          arg.choices.map(({ name, value }) => [name, value])
-                        );
+                      if (arg.choices) option.addChoices(...arg.choices);
 
                       return option;
                     });
@@ -174,10 +168,7 @@ class CommandHandler extends SnowHandler {
                         .setDescription(arg.description)
                         .setRequired(arg.required ?? false);
 
-                      if (arg.choices)
-                        option.addChoices(
-                          arg.choices.map(({ name, value }) => [name, value])
-                        );
+                      if (arg.choices) option.addChoices(...arg.choices);
 
                       return option;
                     });
@@ -231,7 +222,7 @@ class CommandHandler extends SnowHandler {
           const commandsWithSubcommands = parents.map((commands, parent) => {
             const [name, description] = parent.split(':');
 
-            const slashCommand = new SlashCommandBuilder()
+            const slashCommand: SlashCommandBuilder = new SlashCommandBuilder()
               .setName(name!)
               .setDescription(description!);
 
@@ -259,13 +250,7 @@ class CommandHandler extends SnowHandler {
                             .setDescription(arg.description)
                             .setRequired(arg.required ?? false);
 
-                          if (arg.choices)
-                            option.addChoices(
-                              arg.choices.map(({ name, value }) => [
-                                name,
-                                value
-                              ])
-                            );
+                          if (arg.choices) option.addChoices(...arg.choices);
 
                           return option;
                         });
@@ -277,13 +262,7 @@ class CommandHandler extends SnowHandler {
                             .setDescription(arg.description)
                             .setRequired(arg.required ?? false);
 
-                          if (arg.choices)
-                            option.addChoices(
-                              arg.choices.map(({ name, value }) => [
-                                name,
-                                value
-                              ])
-                            );
+                          if (arg.choices) option.addChoices(...arg.choices);
 
                           return option;
                         });
@@ -295,13 +274,7 @@ class CommandHandler extends SnowHandler {
                             .setDescription(arg.description)
                             .setRequired(arg.required ?? false);
 
-                          if (arg.choices)
-                            option.addChoices(
-                              arg.choices.map(({ name, value }) => [
-                                name,
-                                value
-                              ])
-                            );
+                          if (arg.choices) option.addChoices(...arg.choices);
 
                           return option;
                         });
@@ -418,18 +391,22 @@ class CommandHandler extends SnowHandler {
                                   ApplicationCommandOptionType.Integer ||
                                 option.type ===
                                   ApplicationCommandOptionType.Number) &&
+                              !o.autocomplete &&
+                              !option.autocomplete &&
                               o.choices &&
                               option.choices &&
                               o.choices.length === option.choices.length &&
                               !o.choices
                                 .map((choice) => {
-                                  const foundChoice = option.choices!.find(
+                                  const foundChoice = option.choices!.findIndex(
                                     (c) =>
                                       c.name === choice.name &&
                                       c.value === choice.value
                                   );
 
-                                  return foundChoice ? true : false;
+                                  return option.choices![foundChoice]
+                                    ? true
+                                    : false;
                                 })
                                 .includes(false);
 
@@ -843,6 +820,7 @@ class CommandHandler extends SnowHandler {
       rawArgs
     );
 
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const ret = await command.exec(interaction, args);
 
     this.emit(

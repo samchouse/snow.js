@@ -1,7 +1,41 @@
 {
-  "parser": "@typescript-eslint/parser",
-  "extends": ["marine/prettier/node"],
-  "rules": {
-    "@typescript-eslint/no-unused-vars": ["error", { "argsIgnorePattern": "^_", "varsIgnorePattern": "^_" }]
-  }
+  "root": true,
+  "parserOptions": {
+    "ecmaVersion": 2022,
+    "sourceType": "script"
+  },
+  "env": {
+    "es6": true,
+    "node": true,
+    "browser": false
+  },
+  "overrides": [
+    {
+      "files": ["*.js", "*.mjs"],
+      "extends": ["eslint:recommended"],
+      "rules": {
+        "arrow-body-style": ["error"],
+        "prefer-arrow-callback": ["error"],
+        "no-unused-vars": [
+          "error",
+          { "argsIgnorePattern": "^_", "varsIgnorePattern": "^_" }
+        ]
+      }
+    },
+    {
+      "files": ["*.ts"],
+      "parser": "@typescript-eslint/parser",
+      "extends": ["marine/prettier/node", "plugin:prettier/recommended"],
+      "plugins": ["@typescript-eslint", "prettier"],
+      "rules": {
+        "import/order": ["off"],
+        "arrow-body-style": ["error"],
+        "prefer-arrow-callback": ["error"],
+        "@typescript-eslint/no-unused-vars": [
+          "error",
+          { "argsIgnorePattern": "^_", "varsIgnorePattern": "^_" }
+        ]
+      }
+    }
+  ]
 }

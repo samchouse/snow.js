@@ -30,7 +30,7 @@ class SnowError extends Error {
     )
       throw new TypeError(`Error key '${key}' does not exist`);
 
-    // @ts-ignore
+    // @ts-expect-error
     super(Messages[key as keyof typeof Messages](...args));
 
     this.code = key;
